@@ -415,9 +415,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
 // Iniciar servidor
 async function main() {
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
-  console.error("Editor Pro Max MCP Server iniciado");
+  try {
+    const transport = new StdioServerTransport();
+    await server.connect(transport);
+    console.error("Editor Pro Max MCP Server iniciado");
+    console.error("Escuchando conexiones en stdio...");
+  } catch (error) {
+    console.error("Error al iniciar servidor:", error);
+    process.exit(1);
+  }
 }
 
-main().catch(console.error);
+main();
+
+// Mantener el proceso vivo indefinidamente
+setInterval(() => {
+  // Keep-alive tick
+}, 30000);
