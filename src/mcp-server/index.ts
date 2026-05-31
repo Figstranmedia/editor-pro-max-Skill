@@ -19,6 +19,17 @@ import {
   saveTaskHistory,
   getVideoHistory
 } from "./tools/video-generator.js";
+import {
+  analyzeRecentChanges,
+  analyzeProjectUpdates,
+  getProjectReadme
+} from "./tools/github-integration.js";
+import { analyzeLink, compareLinks } from "./tools/link-analysis.js";
+import {
+  generateMultiOutputPlan,
+  adaptVideoForPlatforms,
+  getPlatformRecommendations
+} from "./tools/multi-output.js";
 
 const server = new Server(
   {
@@ -232,6 +243,72 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           required: ["projectPath"]
         }
+      },
+      {
+        name: "analyze_github_changes",
+        description: "Analiza cambios recientes en GitHub y sugiere videos basado en commits",
+        inputSchema: {
+          type: "object" as const,
+          properties: {
+            projectPath: {
+              type: "string",
+              description: "Ruta del proyecto"
+            }
+          },
+          required: ["projectPath"]
+        }
+      },
+      {
+        name: "analyze_link",
+        description: "Analiza una URL y extrae identidad visual, tone of voice, colores, tipografía",
+        inputSchema: {
+          type: "object" as const,
+          properties: {
+            url: {
+              type: "string",
+              description: "URL a analizar (ej: https://ejemplo.com)"
+            }
+          },
+          required: ["url"]
+        }
+      },
+      {
+        name: "generate_multi_output",
+        description: "Genera plan para crear el mismo video en múltiples formatos (TikTok, Instagram, YouTube, etc)",
+        inputSchema: {
+          type: "object" as const,
+          properties: {
+            title: {
+              type: "string",
+              description: "Título del video"
+            },
+            description: {
+              type: "string",
+              description: "Descripción del video"
+            },
+            duration: {
+              type: "number",
+              description: "Duración base en segundos",
+              default: 30
+            }
+          },
+          required: ["title", "description"]
+        }
+      },
+      {
+        name: "get_platform_recommendations",
+        description: "Obtiene recomendaciones específicas para publicar en una plataforma (horarios, hashtags, etc)",
+        inputSchema: {
+          type: "object" as const,
+          properties: {
+            platform: {
+              type: "string",
+              enum: ["tiktok", "instagram", "youtube", "linkedin", "twitter", "facebook"],
+              description: "Plataforma destino"
+            }
+          },
+          required: ["platform"]
+        }
       }
     ]
   };
@@ -287,6 +364,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
 
       case "get_video_history":
         result = await getVideoHistory(args.projectPath);
+        break;
+
+      case "analyze_github_changes":
+        result = await analyzeRecentChanges(args.projectPath);
+        break;
+
+      case "analyze_link":
+        result = await analyzeLink(args.url);
+        break;
+
+      case "generate_multi_output":
+        result = await generateMultiOutputPlan(
+          args.title,
+          args.description,
+          args.duration || 30
+        );
+        break;
+
+      case "get_platform_recommendations":
+        result = getPlatformRecommendations(args.platform);
         break;
 
       default:
