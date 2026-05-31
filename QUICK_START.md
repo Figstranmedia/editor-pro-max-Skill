@@ -5,11 +5,28 @@
 ## Instalación
 
 ```bash
-git clone https://github.com/Figstranmedia/editor-pro-max.git
-cd editor-pro-max
+git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
+cd editor-pro-max-Skill
 npm install
 npm run cli
 ```
+
+## ⚠️ Requisito previo: FFmpeg
+
+Antes de empezar, instala FFmpeg:
+
+```bash
+# macOS
+brew install ffmpeg
+
+# Ubuntu/Debian
+sudo apt-get install ffmpeg
+
+# Windows (Chocolatey)
+choco install ffmpeg
+```
+
+Ver guía completa: [FFMPEG_INSTALLATION.md](FFMPEG_INSTALLATION.md)
 
 ## Eso es todo
 

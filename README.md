@@ -21,7 +21,7 @@ No GUI to learn. No export settings to configure. No API keys needed. Everything
 ### Quick Start
 
 ```bash
-git clone https://github.com/Hainrixz/editor-pro-max.git
+git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
 cd editor-pro-max
 claude
 /start
@@ -188,7 +188,7 @@ No hay interfaz que aprender. No hay configuraciones de exportacion. No se neces
 ### Inicio Rapido
 
 ```bash
-git clone https://github.com/Hainrixz/editor-pro-max.git
+git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
 cd editor-pro-max
 claude
 /start
