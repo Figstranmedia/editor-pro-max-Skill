@@ -31,15 +31,22 @@ That's it. The CLI guides you through everything.
 
 ### Use with Claude Cowork
 
-To use Editor Pro Max as a Claude Cowork skill:
+Editor Pro Max is a **Claude Cowork skill** that scaffolds Remotion projects automatically.
 
-```bash
-npm run mcp:start
+**In Cowork, simply ask:**
+```
+"Create a video for TikTok announcing a new feature"
+"Edit my video and add captions"  
+"Make 3 variations for TikTok, Instagram, and YouTube"
 ```
 
-Then in Cowork: *"Analyze my project and suggest videos to create"*
+Cowork will:
+1. ✅ Scaffold a Remotion project in a folder you choose
+2. ✅ Generate React/Remotion code for your videos
+3. You run `npm run dev` to preview in browser
+4. You run `npx remotion render` to export MP4
 
-See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup and all available MCP tools.
+**Full skill documentation:** See [SKILL.md](SKILL.md)
 
 ### What You Can Do
 
