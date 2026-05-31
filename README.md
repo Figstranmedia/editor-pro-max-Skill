@@ -48,6 +48,8 @@ Cowork will:
 
 **Full skill documentation:** See [SKILL.md](SKILL.md)
 
+**Editing rules & best practices:** See [VIDEO_EDITING_SPECS.md](VIDEO_EDITING_SPECS.md) — defines hook timing, pacing, transitions, text sizing, engagement strategies, platform rules, retention optimization, and pre-render checklists
+
 ### What You Can Do
 
 **Create videos from scratch:**
