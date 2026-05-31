@@ -10,6 +10,7 @@
     "lint": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "mcp:server": "tsx src/mcp-server/index.ts",
+    "mcp:start": "bash start-mcp.sh",
     "cli": "tsx cli/index.ts",
     "video:create": "tsx cli/commands/create.ts",
     "video:schedule": "tsx cli/commands/schedule.ts",
