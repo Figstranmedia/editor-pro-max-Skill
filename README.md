@@ -2,6 +2,10 @@
 
 **AI-Powered Video Editor by [@soyenriquerocha](https://instagram.com/soyenriquerocha)**
 
+[![npm version](https://badge.fury.io/js/@figstranmedia%2Feditor-pro-max.svg)](https://www.npmjs.com/package/@figstranmedia/editor-pro-max)
+[![GitHub License](https://img.shields.io/github/license/Figstranmedia/editor-pro-max-Skill)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/Figstranmedia/editor-pro-max-Skill)](https://github.com/Figstranmedia/editor-pro-max-Skill)
+
 Built with Remotion + Claude Code | React 19 | TypeScript | Whisper AI
 
 ![Editor Pro Max — Landing Page](assets/landing-hero-es.png)
@@ -20,14 +24,23 @@ No GUI to learn. No export settings to configure. No API keys needed. Everything
 
 ### Quick Start
 
+**Option 1: Install from npm** (recommended for Cowork)
 ```bash
-git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
-cd editor-pro-max
-npm install
-npm run cli
+npm install -g @figstranmedia/editor-pro-max
+editor-pro-max create my-video
+cd my-video
+npm run dev
 ```
 
-That's it. The CLI guides you through everything.
+**Option 2: Clone from GitHub** (for development)
+```bash
+git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
+cd editor-pro-max-Skill
+npm install
+npm run dev
+```
+
+Open http://localhost:3000 in your browser to preview and render videos.
 
 ### Use with Claude Cowork
 

@@ -1,5 +1,5 @@
 {
-  "name": "editor-pro-max",
+  "name": "@figstranmedia/editor-pro-max",
   "version": "1.0.0",
   "description": "AI-powered video editor by @soyenriquerocha — built with Remotion and Claude Code",
   "scripts": {
