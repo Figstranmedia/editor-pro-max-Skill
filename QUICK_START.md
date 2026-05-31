@@ -86,8 +86,8 @@ npm run cli
 ## Próximos pasos
 
 - **Documentación completa:** [EDITOR_PRO_MAX_SYSTEM.md](EDITOR_PRO_MAX_SYSTEM.md)
-- **Instalación en Claude Cowork:** [CLAUDE_COWORK_SETUP.md](CLAUDE_COWORK_SETUP.md)
-- **Publicar en GitHub:** [GITHUB_SETUP.md](GITHUB_SETUP.md)
+- **Instalación en Claude Cowork:** [MCP_SETUP.md](MCP_SETUP.md) — Cómo configurar el MCP Server y todos los tools disponibles
+- **Documentación FFmpeg:** [FFMPEG_INSTALLATION.md](FFMPEG_INSTALLATION.md) — Requisito necesario para funcionar
 
 ## ¿Ayuda?
 

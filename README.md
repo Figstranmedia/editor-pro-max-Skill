@@ -23,11 +23,23 @@ No GUI to learn. No export settings to configure. No API keys needed. Everything
 ```bash
 git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
 cd editor-pro-max
-claude
-/start
+npm install
+npm run cli
 ```
 
-That's it. The `/start` command installs everything, verifies the build, and shows you what you can do.
+That's it. The CLI guides you through everything.
+
+### Use with Claude Cowork
+
+To use Editor Pro Max as a Claude Cowork skill:
+
+```bash
+npm run mcp:start
+```
+
+Then in Cowork: *"Analyze my project and suggest videos to create"*
+
+See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup and all available MCP tools.
 
 ### What You Can Do
 
@@ -185,16 +197,28 @@ Editor Pro Max convierte Claude Code en un editor de video profesional. En lugar
 
 No hay interfaz que aprender. No hay configuraciones de exportacion. No se necesitan API keys. Todo corre localmente en tu computadora.
 
-### Inicio Rapido
+### Inicio Rápido
 
 ```bash
 git clone https://github.com/Figstranmedia/editor-pro-max-Skill.git
 cd editor-pro-max
-claude
-/start
+npm install
+npm run cli
 ```
 
-Eso es todo. El comando `/start` instala todo, verifica que funcione, y te muestra lo que puedes hacer.
+Eso es todo. El CLI te guía por todo.
+
+### Usar con Claude Cowork
+
+Para usar Editor Pro Max como skill de Claude Cowork:
+
+```bash
+npm run mcp:start
+```
+
+Luego en Cowork: *"Analiza mi proyecto y sugiere qué videos crear"*
+
+Ver [MCP_SETUP.md](MCP_SETUP.md) para setup detallado y todos los MCP tools disponibles.
 
 ### Que Puedes Hacer
 
