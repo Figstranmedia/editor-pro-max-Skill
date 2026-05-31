@@ -1,0 +1,16 @@
+{
+  "projectPath": ".",
+  "outputFolder": "./videos-output",
+  "greenscreenFolder": "./videos-greenscreen",
+  "referenceFolder": "./references",
+  "defaultFormat": "instagram",
+  "defaultDuration": 30,
+  "autoCreateFolders": true,
+  "trackHistory": true,
+  "preventRepetition": true,
+  "maxHistoryEntries": 100,
+  "defaultSchedule": {
+    "frequency": 1,
+    "times": ["09:00"]
+  }
+}

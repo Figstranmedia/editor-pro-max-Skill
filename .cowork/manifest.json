@@ -1,0 +1,112 @@
+{
+  "id": "video-editor-pro-max",
+  "name": "Video Editor Pro Max",
+  "displayName": "Video Editor Pro Max",
+  "version": "1.0.0",
+  "description": "AI-powered video generator that respects your project's brand identity. Creates videos from scratch or edits existing footage with automatic captions, greenscreen support, and smart scheduling.",
+  "longDescription": "Convert your project into a video powerhouse. Editor Pro Max analyzes your brand (colors, fonts, tone), suggests video ideas, and creates professional videos automatically.\n\nFeatures:\n- Automatic brand identity detection\n- Interactive video creation flow\n- Single or recurring videos (1-3/day)\n- Greenscreen support for post-editing\n- Automatic video history to prevent repetition\n- Smart folder scaffolding\n- Multi-platform ready (TikTok, Instagram, YouTube)",
+  "author": {
+    "name": "Rafael Figueroa",
+    "url": "https://github.com/Figstranmedia",
+    "email": "figueroapastranarafael@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Figstranmedia/editor-pro-max"
+  },
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "remotion",
+    "ai",
+    "claude",
+    "content-generation",
+    "brand-intelligence",
+    "mcp",
+    "automation"
+  ],
+  "homepage": "https://github.com/Figstranmedia/editor-pro-max",
+  "bugs": {
+    "url": "https://github.com/Figstranmedia/editor-pro-max/issues"
+  },
+  "commands": [
+    {
+      "trigger": "/editor-pro-max",
+      "displayName": "Video Editor Pro Max",
+      "description": "Create and manage AI-powered videos with brand intelligence",
+      "subcommands": [
+        {
+          "name": "create",
+          "description": "Create a single video interactively"
+        },
+        {
+          "name": "schedule",
+          "description": "Schedule recurring videos (1-3/day) with content variation"
+        },
+        {
+          "name": "analyze",
+          "description": "Analyze project and show video suggestions based on brand"
+        },
+        {
+          "name": "history",
+          "description": "View video history and avoid repetition"
+        }
+      ]
+    }
+  ],
+  "mcp": {
+    "enabled": true,
+    "transport": "stdio",
+    "command": "npm",
+    "args": ["run", "mcp:server"]
+  },
+  "capabilities": [
+    "brand_analysis",
+    "project_detection",
+    "video_generation",
+    "task_scheduling",
+    "folder_scaffolding",
+    "history_tracking",
+    "greenscreen_support"
+  ],
+  "requirements": {
+    "nodeVersion": "20.0.0"
+  },
+  "installation": {
+    "type": "github",
+    "repository": "Figstranmedia/editor-pro-max",
+    "instructions": "See CLAUDE_COWORK_SETUP.md for detailed installation"
+  },
+  "documentation": {
+    "readme": "README.md",
+    "guide": "EDITOR_PRO_MAX_SYSTEM.md",
+    "coworkSetup": "CLAUDE_COWORK_SETUP.md",
+    "faq": "FAQ.md"
+  },
+  "screenshots": [
+    {
+      "title": "Interactive CLI",
+      "description": "Conversational flow for creating videos",
+      "path": ".cowork/screenshots/cli-demo.png"
+    },
+    {
+      "title": "Brand Analysis",
+      "description": "Automatic detection of project identity",
+      "path": ".cowork/screenshots/brand-analysis.png"
+    },
+    {
+      "title": "Video Output",
+      "description": "Professional video in multiple formats",
+      "path": ".cowork/screenshots/video-output.png"
+    }
+  ],
+  "pricing": {
+    "model": "free",
+    "description": "Completely free and open source"
+  },
+  "stats": {
+    "rating": 5,
+    "downloads": 0,
+    "reviews": 0
+  }
+}
