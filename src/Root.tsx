@@ -3,6 +3,9 @@ import {Composition, Folder} from "remotion";
 // Compositions
 import {ShowcaseComposition} from "./compositions/Showcase";
 
+// Promotional video
+import {PromoVideoMaster, PromoVideoTikTok, PromoVideoLinkedIn} from "./compositions/PromoVideoMaster";
+
 // Social templates
 import {TikTokVideo} from "./templates/social/TikTokVideo";
 import {InstagramReel} from "./templates/social/InstagramReel";
@@ -161,6 +164,36 @@ export const RemotionRoot: React.FC = () => {
             showCaptions: true,
             captionPreset: "bold" as const,
           }}
+        />
+      </Folder>
+
+      <Folder name="Promotional">
+        <Composition
+          id="editor-pro-max-promo-master"
+          component={PromoVideoMaster}
+          durationInFrames={2700}
+          fps={30}
+          width={1920}
+          height={1080}
+          defaultProps={{}}
+        />
+        <Composition
+          id="editor-pro-max-promo-tiktok"
+          component={PromoVideoTikTok}
+          durationInFrames={900}
+          fps={30}
+          width={1080}
+          height={1920}
+          defaultProps={{}}
+        />
+        <Composition
+          id="editor-pro-max-promo-linkedin"
+          component={PromoVideoLinkedIn}
+          durationInFrames={1350}
+          fps={30}
+          width={1200}
+          height={628}
+          defaultProps={{}}
         />
       </Folder>
     </>

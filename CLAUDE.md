@@ -588,3 +588,145 @@ const totalSeconds = calculateTotalDuration(merged);
 // Offset captions for clip extraction
 const clipped = offsetCaptions(captions, 5000); // shift by 5 seconds
 ```
+
+## 🌍 External Project Mode (Cowork Skill Integration)
+
+When invoked by the Cowork skill, Editor Pro Max renders videos to the **user's project**, not to its own `video/output/` folder. This section documents the external project rendering flow.
+
+### Architecture
+
+**Normal mode (internal):**
+```
+/Users/name/Desktop/editor-pro-max-Skill/
+├── src/compositions/    ← Create videos here
+├── video/output/        ← Render destination
+└── CLAUDE.md            ← This file
+```
+
+**External mode (Cowork):**
+```
+/Users/name/my-project/             ← User's project
+├── src/components/                  ← User's components
+├── videos/renders/                  ← Render destination (created by Editor Pro Max)
+└── (user calls Editor Pro Max)
+
+/Users/name/Desktop/editor-pro-max-Skill/  ← Editor Pro Max stays here
+├── src/compositions/
+└── (renders to user's videos/renders/)
+```
+
+### Rendering to External Path
+
+**Command pattern:**
+```bash
+# Absolute path (safest)
+npx remotion render <CompositionId> /Users/name/my-project/videos/renders/video.mp4
+
+# Relative path from editor-pro-max
+npx remotion render <CompositionId> ../../my-project/videos/renders/video.mp4
+```
+
+**Helper script (optional):**
+```bash
+#!/bin/bash
+# scripts/render-external.sh
+# Usage: ./scripts/render-external.sh MyComposition /path/to/user/project video.mp4
+
+COMPOSITION=$1
+PROJECT_PATH=$2
+OUTPUT_FILE=$3
+
+# Resolve to absolute path
+DEST_DIR="$PROJECT_PATH/videos/renders"
+mkdir -p "$DEST_DIR"
+
+# Render
+npx remotion render "$COMPOSITION" "$DEST_DIR/$OUTPUT_FILE"
+echo "✅ Rendered to: $DEST_DIR/$OUTPUT_FILE"
+```
+
+### When Creating Compositions for External Render
+
+1. **Import paths must be relative to editor-pro-max**, not the user's project:
+   ```tsx
+   // ✅ CORRECT
+   import { TikTokVideo } from "../templates/social/TikTokVideo";
+   
+   // ❌ WRONG (user's project structure)
+   import { MyComponent } from "../../my-project/src/components/Custom";
+   ```
+
+2. **Media files in compositions use relative paths to editor-pro-max:**
+   ```tsx
+   // ✅ CORRECT
+   <FitImage src={staticFile("assets/logo.png")} />
+   
+   // ❌ WRONG
+   <FitImage src={staticFile("../../my-project/assets/logo.png")} />
+   ```
+
+3. **User's assets can be passed as props:**
+   ```tsx
+   interface MyVideoProps {
+     userLogoPath: string; // Passed by skill
+     brandColors: string[];
+   }
+   
+   export const MyVideo: React.FC<MyVideoProps> = ({
+     userLogoPath,
+     brandColors,
+   }) => {
+     // userLogoPath = user's absolute path
+     // Render system handles the asset during render
+   };
+   ```
+
+### Output Location Resolution
+
+When Cowork skill invokes Editor Pro Max:
+
+1. **Skill provides:**
+   - Composition ID: `editor-pro-max-promo-tiktok`
+   - Output format: TikTok (1080x1920)
+   - User's project path: `/Users/name/my-project/`
+
+2. **Claude (this file) should:**
+   - Resolve destination: `/Users/name/my-project/videos/renders/`
+   - Create directory if missing
+   - Render with absolute path
+   - Return absolute path to generated video
+
+3. **Example invocation:**
+   ```tsx
+   // From SKILL.md (Cowork context)
+   // User asked: "Create a TikTok for my product launch"
+   
+   // Claude generates:
+   const renderPath = "/Users/name/my-project/videos/renders";
+   await sh(`mkdir -p "${renderPath}"`);
+   
+   const cmd = `npx remotion render editor-pro-max-promo-tiktok "${renderPath}/product_launch_tiktok.mp4"`;
+   await sh(cmd);
+   
+   // Returns: /Users/name/my-project/videos/renders/product_launch_tiktok.mp4
+   ```
+
+### Troubleshooting External Renders
+
+**"No such file or directory"**
+- Verify absolute path is correct
+- Create `videos/renders/` directory in user's project
+- Check file permissions (rwx on directory)
+
+**"staticFile not found"**
+- Assets must be in editor-pro-max's `public/assets/`
+- User assets are passed as props, not as file paths
+
+**"Output file exists, overwrite?"**
+- Use `--overwrite` flag: `npx remotion render ... --overwrite`
+
+### Reference
+
+- **SKILL.md** — How Cowork invokes this flow
+- **VIDEO_EDITING_SPECS.md** — Rules that apply regardless of render location
+- **Root.tsx** — Composition registry (all compositions registered here)
