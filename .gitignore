@@ -1,5 +1,6 @@
 node_modules/
 out/
+build/
 media/video/
 media/audio/
 media/images/
@@ -9,6 +10,7 @@ dist/
 *.webm
 *.mov
 *.gif
+*.skill
 
 # Agent configs (created by skills installer for other AI tools)
 .codebuddy/
