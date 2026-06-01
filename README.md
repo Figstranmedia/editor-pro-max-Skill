@@ -2,7 +2,7 @@
 
 **AI-Powered Video Editor by [@soyenriquerocha](https://instagram.com/soyenriquerocha)**
 
-[![npm version](https://badge.fury.io/js/@figstranmedia%2Feditor-pro-max.svg)](https://www.npmjs.com/package/@figstranmedia/editor-pro-max)
+[![npm version](https://badge.fury.io/js/editor-pro-max-skill.svg)](https://www.npmjs.com/package/editor-pro-max-skill)
 [![GitHub License](https://img.shields.io/github/license/Figstranmedia/editor-pro-max-Skill)](LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/Figstranmedia/editor-pro-max-Skill)](https://github.com/Figstranmedia/editor-pro-max-Skill)
 
@@ -26,8 +26,8 @@ No GUI to learn. No export settings to configure. No API keys needed. Everything
 
 **Option 1: Install from npm** (recommended for Cowork)
 ```bash
-npm install -g @figstranmedia/editor-pro-max
-editor-pro-max create my-video
+npm install -g editor-pro-max-skill
+editor-pro-max-skill create my-video
 cd my-video
 npm run dev
 ```
