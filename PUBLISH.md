@@ -1,6 +1,6 @@
 # Publishing to npm
 
-Guía oficial para publicar `editor-pro-max-skill` a npm (Claude Cowork Skill).
+Guía oficial para publicar `@figstranmedia/editor-pro-max-skill` a npm (Claude Cowork Skill).
 
 ---
 
@@ -53,10 +53,10 @@ Después de 2-3 minutos, chequea:
 
 ```bash
 # En terminal
-npm view editor-pro-max-skill
+npm view @figstranmedia/editor-pro-max-skill
 
 # O en web
-https://www.npmjs.com/package/editor-pro-max-skill
+https://www.npmjs.com/package/@figstranmedia/editor-pro-max-skill
 ```
 
 ---
