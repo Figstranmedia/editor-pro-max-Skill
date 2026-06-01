@@ -1,6 +1,6 @@
 {
   "name": "@figstranmedia/editor-pro-max",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "AI-powered video editor by @soyenriquerocha — built with Remotion and Claude Code",
   "scripts": {
     "dev": "remotion studio --browser=chrome",
