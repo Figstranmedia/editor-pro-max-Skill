@@ -1,269 +1,257 @@
 ---
 name: editor-pro-max
 description: >
-  AI video editor powered by Remotion. Use this skill whenever the user wants to create a video,
-  make a TikTok, Instagram Reel, YouTube Short, presentation, testimonial, announcement,
-  or promo clip — even if they just describe a video concept in natural language.
-  Also use when they want to edit existing footage: remove silences, add captions, extract podcast clips,
-  or create talking-head edits. Use proactively any time the user says things like "make me a video",
-  "create a clip", "edit this footage", "add captions", "remove the pauses", "render for TikTok",
-  or "I need a social media video." The project uses Remotion (React-based video framework) —
-  you write React components to create videos; the user previews in a browser and renders to MP4.
+  AI video editor that creates professional videos FROM the user's project content.
+  Use this skill whenever the user wants to create a video, TikTok, Instagram Reel,
+  YouTube Short, presentation, testimonial, announcement, or promo clip — even if they
+  just describe a concept in natural language. Also use when editing footage: removing
+  silences, adding captions, extracting podcast clips, or creating talking-head edits.
+  Trigger any time the user says things like "make me a video", "create a clip about my
+  project", "edit this footage", "add captions", "remove the pauses", "render for TikTok",
+  "promote my product with a video", or "I need a social media video about this."
+  The skill reads the current project context, generates a Remotion composition, and
+  exports the rendered MP4 to the user's project folder at videos/renders/.
 ---
 
-# Editor Pro Max — AI Video Editor
+# Editor Pro Max — AI Video Creator
 
-You are a professional video editor working inside an **Editor Pro Max** Remotion project. Users describe videos in natural language; you write the React/Remotion code to build them.
-
-## 🎬 CRITICAL: Editing Rules & Specifications
-
-**Before creating any video composition, read and follow [VIDEO_EDITING_SPECS.md](VIDEO_EDITING_SPECS.md)**
-
-This document defines:
-- ✅ Hook timing and engagement strategies
-- ✅ Pacing rules by platform and content type
-- ✅ Transition speeds and types
-- ✅ Text sizing for device legibility
-- ✅ Brand consistency and style rules
-- ✅ Audio guidelines and mixing
-- ✅ CTA placement and timing
-- ✅ Platform-specific checklists
-- ✅ Retention curve optimization
-- ✅ Pre-render validation checklist
-
-**Use these specs to make confident editing decisions without back-and-forth.**
-
-## First — Check Node Modules
-
-Before anything else, verify `node_modules/` exists in the project folder. If it doesn't, run `npm install` silently. After install, confirm readiness. If it exists, skip setup and go straight to the user's request.
-
-```bash
-ls node_modules/ 2>/dev/null | head -1 || npm install
-```
-
-## Quick Commands
-
-```bash
-npm run dev                                        # Preview in browser at localhost:3000
-npx remotion render <CompositionId> out/video.mp4  # Render to file
-npx remotion still <CompositionId> out/thumb.png --frame=45  # Thumbnail
-./scripts/batch-render.sh Showcase youtube tiktok  # Multi-platform batch
-```
+You create videos **from the user's project content**. You are operating in **External Project Mode**: the user's project is the context source, and Editor Pro Max (Remotion) is the rendering engine. Videos land back inside the user's project.
 
 ---
 
-## Workflow: Creating a New Video
+## Editor Pro Max location
 
-1. **Create** `src/compositions/MyVideo.tsx` using components from `src/components/` and templates from `src/templates/`
-2. **Register** it in `src/Root.tsx` with a `<Composition>` element
-3. Tell the user to run `npm run dev` to preview, then `npx remotion render MyVideo out/my-video.mp4` to export
+The rendering engine lives at:
+```
+/Users/<user>/Desktop/editor-pro-max-Skill/
+```
+Adjust this path if the user has it elsewhere. All component imports reference this path.
 
-### Composition Registration Template
+---
+
+## Step 1 — Read the user's project
+
+Scan the connected folder to understand the project before writing any video code:
+
+```bash
+ls && cat README.md 2>/dev/null
+cat package.json 2>/dev/null | head -20
+find . -name "*.md" -not -path "*/node_modules/*" | head -10
+find . \( -name "*.png" -o -name "*.jpg" -o -name "*.svg" -o -name "*.mp4" \) | grep -v node_modules | head -20
+```
+
+Extract: product name, tagline, key benefit, CTA, color palette, logo path, any existing footage.
+
+---
+
+## Step 2 — Propose & confirm
+
+Based on the context, propose 2–3 video formats, for example:
+- TikTok/Reel announcing the product
+- YouTube Short demo
+- Presentation for investors
+- Podcast clip extraction
+
+Confirm with the user: platform, key message, and output folder (default: `videos/renders/`).
+
+---
+
+## Step 3 — Set up the output structure
+
+Create this in the **user's project folder**:
+
+```
+{user-project}/
+└── videos/
+    ├── compositions/    ← generated .tsx files
+    ├── assets/          ← media referenced by the video
+    └── renders/         ← final MP4 files land here
+```
+
+```bash
+mkdir -p videos/compositions videos/assets videos/renders
+```
+
+---
+
+## Step 4 — Generate the composition
+
+Write `videos/compositions/MyVideo.tsx`. Import from Editor Pro Max using its absolute path:
 
 ```tsx
-<Composition
-  id="MyVideo"           // used in render command
-  component={MyVideo}
-  durationInFrames={300} // 10 seconds @ 30fps
-  fps={30}
-  width={1920}
-  height={1080}
-  defaultProps={{ /* ... */ }}
-/>
+import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Sequence, staticFile} from "remotion";
+
+// Editor Pro Max components — adjust path to match installation
+import {TikTokVideo} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/templates/social/TikTokVideo";
+import {AnimatedTitle} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/components/text/AnimatedTitle";
+import {GradientBackground} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/components/backgrounds/GradientBackground";
+import {loadDefaultFonts} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/presets/fonts";
+
+loadDefaultFonts();
+
+export const MyVideo: React.FC = () => { ... };
+```
+
+> **Simpler alternative**: write a self-contained composition using only `remotion` primitives — no editor-pro-max imports. Then the user just drops it into `editor-pro-max/src/compositions/` and renders from there.
+
+---
+
+## Step 5 — Render to the user's project
+
+### Option A — Copy + render from Editor Pro Max (recommended)
+
+```bash
+# 1. Copy the composition into editor-pro-max
+cp {user-project}/videos/compositions/MyVideo.tsx \
+   /Users/<user>/Desktop/editor-pro-max-Skill/src/compositions/
+
+# 2. Register it in Root.tsx (add the Composition block)
+
+# 3. Render — output goes back to the user's project
+cd /Users/<user>/Desktop/editor-pro-max-Skill
+npx remotion render MyVideo \
+  /absolute/path/to/user-project/videos/renders/my-video.mp4
+```
+
+Use the helper script for this:
+```bash
+./scripts/render-external.sh MyVideo /absolute/path/to/user-project my-video.mp4
+```
+
+### Option B — Standalone Remotion (no editor-pro-max needed)
+
+```bash
+cd {user-project}/videos
+npm init remotion@latest .
+# drop composition in src/, then:
+npx remotion render MyVideo renders/my-video.mp4
 ```
 
 ---
 
-## Platform Dimensions (pick the right one)
+## Platform specs
 
-| Platform | Width | Height | FPS | Max Duration |
+| Platform | Width | Height | FPS | Duration |
 |---|---|---|---|---|
-| TikTok | 1080 | 1920 | 30 | 60s |
-| Instagram Reel | 1080 | 1920 | 30 | 90s |
-| Instagram Story | 1080 | 1920 | 30 | 15s |
-| YouTube Short | 1080 | 1920 | 60 | 60s |
+| TikTok | 1080 | 1920 | 30 | ≤60s |
+| Instagram Reel | 1080 | 1920 | 30 | ≤90s |
+| Instagram Story | 1080 | 1920 | 30 | ≤15s |
+| YouTube Short | 1080 | 1920 | 60 | ≤60s |
 | YouTube / Presentation | 1920 | 1080 | 30 | any |
-| Square (Twitter/IG Post) | 1080 | 1080 | 30 | 140s |
-
-Use `secondsToFrames(seconds, fps)` from `src/presets/dimensions.ts` for frame math.
-
----
-
-## Ready-Made Templates (fastest path)
-
-Import and register — minimal code needed.
-
-### Social
-
-```tsx
-import {TikTokVideo} from "./templates/social/TikTokVideo";
-// Props: hook, body, cta
-<TikTokVideo hook="Did you know?" body="AI edits videos." cta="Follow for more" />
-
-import {InstagramReel} from "./templates/social/InstagramReel";
-// Props: headline, subtext, brandName
-
-import {YouTubeShort} from "./templates/social/YouTubeShort";
-// Props: title, subtitle
-```
-
-### Content
-
-```tsx
-import {Presentation} from "./templates/content/Presentation";
-// Props: slides [{title, body}], framesPerSlide
-
-import {Testimonial} from "./templates/content/Testimonial";
-// Props: quote, author, role
-```
-
-### Promo
-
-```tsx
-import {Announcement} from "./templates/promo/Announcement";
-// Props: preTitle, title, subtitle, cta
-
-import {BeforeAfter} from "./templates/promo/BeforeAfter";
-// Children: before/after content, Props: beforeLabel, afterLabel
-```
+| LinkedIn | 1200 | 628 | 30 | ≤10min |
+| Square (IG Post / X) | 1080 | 1080 | 30 | ≤140s |
 
 ---
 
-## Editing Existing Footage
+## Hook rules (from VIDEO_EDITING_SPECS.md)
 
-### Step 1 — Run the pipeline (in order)
+The first 3 seconds determine retention. Always follow these:
 
-```bash
-# Place video at public/assets/video.mp4 first, then:
-npx tsx scripts/analyze-video.ts public/assets/video.mp4    # → public/video-metadata.json
-npx tsx scripts/extract-audio.ts public/assets/video.mp4    # → public/assets/audio.wav
-npx tsx scripts/transcribe.ts                                # → public/captions.json
-npx tsx scripts/detect-silence.ts public/assets/video.mp4   # → public/silence.json
-```
+| Platform | Hook pattern |
+|---|---|
+| TikTok / Reels | Zoom, bold text 72pt+, trending audio. Never start with a logo or slow fade |
+| YouTube / LinkedIn | Statement, question, or value promise. No clickbait |
+| Short form (X) | Bold stat or quote, 2–3s max hook |
 
-### Step 2 — Use editing templates
-
-**TalkingHeadEdit** (all-in-one — removes silence, adds captions, lower third, CTA):
-```tsx
-<TalkingHeadEdit
-  videoSrc="assets/video.mp4"
-  captionsPath="captions.json"
-  silencePath="silence.json"
-  removeSilence={true}
-  showCaptions={true}
-  captionPreset="bold"        // classic | bold | outline | glow | box
-  title="My Video"
-  speakerName="John Doe"
-  speakerTitle="CEO"
-  ctaText="Subscribe"
-  backgroundMusic="assets/music.mp3"
-  musicVolume={0.15}
-/>
-```
-
-**PodcastClip** (extract a viral clip from longer content):
-```tsx
-<PodcastClip
-  videoSrc="assets/podcast.mp4"
-  clipStartSeconds={120}
-  clipEndSeconds={150}
-  captionsPath="captions.json"
-  showCaptions={true}
-  captionPreset="glow"
-  title="Best moment from today"
-/>
-```
+Pacing reference: 6–15s video → cut every 1.5–2.5s. 15–30s → every 2–3s. 30–60s → every 3–4s.
 
 ---
 
-## Component Reference (build custom compositions)
+## Ready-made templates
 
-### Text
+### Social (vertical)
 
 ```tsx
-// Animated title with enter/exit
-<AnimatedTitle
-  text="Hello World"
-  fontSize={72}
-  color="#ffffff"
-  enterAnimation="slideUp"   // fade|slideUp|slideDown|slideLeft|slideRight|scale|typewriter|blur
-  exitAnimation="fade"
-  enterDuration={20}
-  holdDuration={60}
-  exitDuration={15}
-/>
+<TikTokVideo hook="Did you know?" body="Your key benefit." cta="Download free" />
+<InstagramReel headline="Your headline" subtext="Supporting text" brandName="Brand" />
+<YouTubeShort title="Title" subtitle="Subtitle" />
+```
 
-// News-style lower third
+### Content / Promo (horizontal)
+
+```tsx
+<Presentation slides={[{title: "Intro", body: "..."}, {title: "Problem", body: "..."}]} />
+<Testimonial quote="Amazing!" author="Jane Doe" role="CEO" />
+<Announcement preTitle="Introducing" title="Product" subtitle="Tagline" cta="Learn More" />
+```
+
+### Registered promotional compositions (ready to render)
+
+These exist in editor-pro-max and can be rendered immediately:
+
+| ID | Format | Duration | Use for |
+|---|---|---|---|
+| `editor-pro-max-promo-master` | 1920×1080 | 90s | YouTube master |
+| `editor-pro-max-promo-tiktok` | 1080×1920 | 30s | TikTok / Reel |
+| `editor-pro-max-promo-linkedin` | 1200×628 | 45s | LinkedIn |
+
+---
+
+## Building custom compositions
+
+### Animation rules (non-negotiable)
+- **Always** use `useCurrentFrame()` — never CSS transitions (causes flickering in Remotion)
+- **Always** clamp with `extrapolateRight: "clamp"`
+- Use `spring()` for natural motion, `interpolate()` for precise control
+
+```tsx
+const frame = useCurrentFrame();
+const {fps} = useVideoConfig();
+
+// Fade in
+const opacity = interpolate(frame, [0, 20], [0, 1], {extrapolateRight: "clamp"});
+
+// Spring scale-up
+const progress = spring({fps, frame: frame - 10, config: {damping: 12, stiffness: 100}});
+const scale = interpolate(progress, [0, 1], [0.8, 1], {extrapolateRight: "clamp"});
+
+// Enter-hold-exit shorthand
+import {enterHoldExit} from "editor-pro-max/src/utils/math";
+const opacity = enterHoldExit(frame, 20, 60, 15);
+
+// Scene timing
+<Sequence from={0} durationInFrames={90}><Scene1 /></Sequence>
+<Sequence from={90} durationInFrames={90}><Scene2 /></Sequence>
+```
+
+### Key components
+
+```tsx
+// Text
+<AnimatedTitle text="Hello" fontSize={72} color="#fff" enterAnimation="slideUp"
+  enterDuration={20} holdDuration={60} exitDuration={15} />
+<TypewriterText text="Hello!" fontSize={48} typingSpeed={2} cursorColor="#6366f1" />
 <LowerThird name="John Doe" title="CEO" accentColor="#6366f1" position="bottomLeft" />
+<CaptionOverlay captionsSource="captions.json" preset="bold" highlightColor="#39E508" />
+<WordByWordCaption words={[{text:"Hi", startFrame:0, endFrame:15}]} position="bottom" />
 
-// Typewriter character reveal
-<TypewriterText text="Hello!" fontSize={48} typingSpeed={2} />
-
-// Karaoke-style word highlight (for captions)
-<WordByWordCaption
-  words={[{text: "Hello", startFrame: 0, endFrame: 15}]}
-  highlightColor="#ffffff"
-  position="bottom"
-/>
-
-// TikTok-style caption overlay (auto-loads captions.json)
-<CaptionOverlay captionsSource="captions.json" preset="bold" position="bottom" />
-```
-
-### Backgrounds
-
-```tsx
+// Backgrounds
 <GradientBackground colors={["#0f0f23", "#1a1a3e"]} angle={135} animateAngle />
+// Gradient presets: GRADIENTS.sunset | ocean | forest | purple | fire | midnight | aurora
 <ParticleField count={50} color="rgba(255,255,255,0.3)" speed={0.5} direction="up" />
 <GridPattern type="dots" spacing={40} animate />
 <ColorWash color="#0a0a0a" />
-```
 
-Available gradient presets: `GRADIENTS.sunset`, `GRADIENTS.ocean`, `GRADIENTS.forest`, `GRADIENTS.purple`, `GRADIENTS.fire`, `GRADIENTS.midnight`, `GRADIENTS.aurora`
-
-### Overlays
-
-```tsx
+// Overlays
 <ProgressBar color="#6366f1" height={4} position="bottom" />
 <Watermark text="@brand" corner="bottomRight" opacity={0.5} />
 <CallToAction text="Subscribe" subtext="Turn on notifications" enterDelay={60} />
 <CountdownTimer startFrom={150} fontSize={120} label="Starting in" />
-```
 
-### Media
-
-```tsx
+// Media
 <FitVideo src={staticFile("assets/video.mp4")} fit="cover" volume={0.8} />
 <FitImage src={staticFile("photo.jpg")} kenBurns="zoomIn" kenBurnsIntensity={0.1} />
-<Slideshow images={[staticFile("1.jpg"), staticFile("2.jpg")]} kenBurns transitionDuration={15} />
-
-// Trimmed video clip
+<Slideshow images={[staticFile("1.jpg"), staticFile("2.jpg")]} transitionDuration={15} />
 <VideoClip src={staticFile("assets/video.mp4")} trimStartSeconds={5} trimEndSeconds={30} />
-
-// Auto-cut silence (needs segments from useSilenceSegments hook)
 <JumpCut src={staticFile("assets/video.mp4")} segments={speechSegments} paddingSeconds={0.1} />
-
-// Image with enter/exit animation
 <ImageOverlay src={staticFile("logo.png")} x={60} y={60} width={120} enterAnimation="scale" />
+<AudioTrack src={staticFile("music.mp3")} volume={0.15} loop fadeInDurationSeconds={2}
+  duckDuringSegments={speechSegments} duckVolume={0.05} />
 
-// Background music with speech ducking
-<AudioTrack src={staticFile("music.mp3")} volume={0.15} loop fadeInDurationSeconds={2} />
-```
-
-### Layout
-
-```tsx
-<SplitScreen direction="horizontal" ratio={0.5} gap={4}>
-  <LeftPanel />
-  <RightPanel />
-</SplitScreen>
-
-<PictureInPicture
-  main={<FitVideo src="main.mp4" />}
-  pip={<FitVideo src="webcam.mp4" />}
-  corner="bottomRight" pipWidth={360} pipHeight={240}
-/>
-
+// Layout
+<SplitScreen direction="horizontal" ratio={0.5} gap={4}><Left /><Right /></SplitScreen>
+<PictureInPicture main={<FitVideo src="main.mp4" />} pip={<FitVideo src="webcam.mp4" />}
+  corner="bottomRight" pipWidth={360} pipHeight={240} />
 <SafeArea paddingHorizontal={60} paddingVertical={60}>...</SafeArea>
 ```
 
@@ -282,98 +270,111 @@ import {TRANSITION_PRESETS} from "../components/transitions/TransitionPresets";
 
 Available: `crossfade`, `fadeQuick`, `fadeSlow`, `slideLeft`, `slideRight`, `slideUp`, `slideDown`, `wipeLeft`, `wipeRight`, `clockwise`, `cut`
 
----
+### Presets
 
-## Animation Patterns
-
-**Golden rules:**
-- Always use `useCurrentFrame()` — never CSS transitions (causes flickering)
-- Always clamp with `extrapolateRight: "clamp"`
-- Use `spring()` for natural motion, `interpolate()` for precise control
-
-```tsx
-const frame = useCurrentFrame();
-const {fps} = useVideoConfig();
-
-// Fade in
-const opacity = interpolate(frame, [0, 20], [0, 1], {extrapolateRight: "clamp"});
-
-// Slide up with spring
-const progress = spring({fps, frame, config: {damping: 14, stiffness: 120}});
-const translateY = interpolate(progress, [0, 1], [50, 0]);
-
-// Enter → hold → exit (shorthand)
-import {enterHoldExit} from "../utils/math";
-const opacity = enterHoldExit(frame, 20, 60, 15);
-```
-
-**Timing sequences:**
-```tsx
-<Sequence from={0} durationInFrames={90}><Scene1 /></Sequence>
-<Sequence from={90} durationInFrames={90}><Scene2 /></Sequence>
-<Sequence from={180}><Scene3 /></Sequence>
-```
+- **Colors**: palettes `dark`, `light`, `vibrant`, `warm`, `cool`, `neon`
+- **Fonts**: `heading` (Inter), `mono` (JetBrains Mono), `display` (Poppins), `elegant` (Playfair Display). Always call `loadDefaultFonts()`.
+- **Easings**: `easeIn`, `easeOut`, `easeInOut`, `bounceOut`, `elastic`, `backOut`, `sharp`, `smooth`, `snappy`
 
 ---
 
-## Presets
+## Editing existing footage
 
-**Colors** (`src/presets/colors.ts`): palettes `dark`, `light`, `vibrant`, `warm`, `cool`, `neon`
-
-**Fonts** (`src/presets/fonts.ts`): `heading` (Inter), `mono` (JetBrains Mono), `display` (Poppins), `elegant` (Playfair Display). Always call `loadDefaultFonts()` in the composition.
-
-**Easings** (`src/presets/easings.ts`): `easeIn`, `easeOut`, `easeInOut`, `bounceOut`, `elastic`, `backOut`, `sharp`, `smooth`, `snappy`
-
----
-
-## Hooks
-
-```tsx
-// Animation state
-const {opacity, isEntering} = useAnimation({enterDuration: 20, holdDuration: 60, exitDuration: 15});
-
-// Color palette
-const colors = useColorScheme("dark"); // colors.bg, colors.text, colors.accent
-
-// Load video metadata from pipeline
-const metadata = useVideoMetadata("video-metadata.json");
-
-// Load captions
-const {pages} = useTranscription("captions.json", 1200);
-
-// Load silence segments
-const {speechSegments} = useSilenceSegments("silence.json");
-```
-
----
-
-## Rendering Reference
+Run the pipeline first (from inside editor-pro-max, pointing to the user's asset):
 
 ```bash
-npx remotion render Showcase out/showcase.mp4           # MP4 (H.264)
-npx remotion render Showcase out/video.webm --codec=vp8
-npx remotion render Showcase out/video.mov --codec=prores --prores-profile=4444
-npx remotion render Showcase out/animation.gif --codec=gif
-npx remotion render Showcase out/clip.mp4 --frames=0-90  # Specific frames
-npx remotion still Showcase out/thumbnail.png --frame=45
-./scripts/batch-render.sh Showcase youtube tiktok square # Multi-platform
+cd /Users/<user>/Desktop/editor-pro-max-Skill
+npx tsx scripts/analyze-video.ts /abs/path/to/user-project/videos/assets/video.mp4
+npx tsx scripts/extract-audio.ts /abs/path/to/user-project/videos/assets/video.mp4
+npx tsx scripts/transcribe.ts
+npx tsx scripts/detect-silence.ts /abs/path/to/user-project/videos/assets/video.mp4
+```
+
+Then use editing templates:
+
+```tsx
+// All-in-one: silence removal + captions + lower third + CTA
+<TalkingHeadEdit
+  videoSrc="assets/video.mp4"
+  captionsPath="captions.json"
+  silencePath="silence.json"
+  removeSilence={true}
+  showCaptions={true}
+  captionPreset="bold"        // classic | bold | outline | glow | box
+  speakerName="Rafael"
+  speakerTitle="Founder"
+  ctaText="Subscribe"
+  backgroundMusic="assets/music.mp3"
+  musicVolume={0.15}
+/>
+
+// Extract a viral clip
+<PodcastClip
+  videoSrc="assets/podcast.mp4"
+  clipStartSeconds={120}
+  clipEndSeconds={150}
+  captionsPath="captions.json"
+  showCaptions={true}
+  captionPreset="glow"
+  title="Best moment from today"
+/>
 ```
 
 ---
 
-## File Placement
+## Render commands reference
 
-- User media → `public/assets/filename.ext`, reference with `staticFile("assets/filename.ext")`
-- Pipeline outputs → `public/` (video-metadata.json, captions.json, silence.json)
-- New compositions → `src/compositions/MyVideo.tsx`
-- Register everything in `src/Root.tsx`
+```bash
+# From inside editor-pro-max, render to user's project
+npx remotion render MyVideo /abs/path/videos/renders/my-video.mp4
+
+# With overwrite
+npx remotion render MyVideo /abs/path/videos/renders/my-video.mp4 --overwrite
+
+# Specific codec
+npx remotion render MyVideo out/video.webm --codec=vp8
+
+# ProRes (high quality)
+npx remotion render MyVideo out/video.mov --codec=prores --prores-profile=4444
+
+# GIF
+npx remotion render MyVideo out/animation.gif --codec=gif
+
+# Still / thumbnail
+npx remotion still MyVideo out/thumbnail.png --frame=45
+
+# Batch (multiple platforms)
+./scripts/batch-render.sh MyVideo youtube tiktok square
+
+# Helper script (renders to external path)
+./scripts/render-external.sh MyVideo /abs/path/to/user-project my-video.mp4
+```
 
 ---
 
-## Common Mistakes to Avoid
+## Registration template (Root.tsx)
 
-- **Never use CSS transitions** — use `interpolate()` / `spring()` with `useCurrentFrame()`
-- **Always register** new compositions in `src/Root.tsx` or they won't appear in Studio
-- **Use `<AbsoluteFill>`** for layering — last child renders on top
-- **Run the pipeline before editing** — CaptionOverlay and JumpCut need the JSON files
-- **`staticFile()`** is required for media paths — don't use raw strings
+```tsx
+import {MyVideo} from "./compositions/MyVideo";
+
+<Composition
+  id="MyVideo"
+  component={MyVideo}
+  durationInFrames={300}     // secondsToFrames(10, 30) = 300
+  fps={30}
+  width={1080}
+  height={1920}              // vertical for TikTok/Reel
+  defaultProps={{}}
+/>
+```
+
+---
+
+## Common mistakes to avoid
+
+- **Never CSS transitions** — always `interpolate()` / `spring()` with `useCurrentFrame()`
+- **Always register** compositions in `Root.tsx` before rendering
+- **`staticFile()`** for all media paths — relative to `public/` in editor-pro-max
+- **User assets** passed as props, not as `staticFile()` paths from the user's project
+- **Run the pipeline** before using `CaptionOverlay` or `JumpCut` — they need the JSON files
+- **Use `--overwrite`** if re-rendering to avoid interactive prompts
