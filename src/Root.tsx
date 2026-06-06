@@ -178,7 +178,7 @@ export const RemotionRoot: React.FC = () => {
             segmentIndex: 0,
             showCaptions: true,
             showHook: true,
-            captionPreset: "bold" as const,
+            captionPreset: "karaoke" as const,
             accentColor: "#6366f1",
           }}
         />

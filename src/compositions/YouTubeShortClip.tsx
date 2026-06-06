@@ -68,7 +68,7 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
   title,
   hook,
   videoSrc = "assets/video.mp4",
-  captionPreset = "bold",
+  captionPreset = "karaoke",
   accentColor = "#6366f1",
   showCaptions = true,
   showHook = true,
@@ -99,25 +99,30 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
         />
       )}
 
-      {/* Hook text at start — first 3 seconds */}
+      {/* Hook text — centered in frame (2026 Reels standard: dead center, 80-120pt) */}
       {showHook && hook && (
-        <Sequence from={0} durationInFrames={90}>
-          <SafeArea>
-            <AbsoluteFill style={{justifyContent: "flex-start", alignItems: "center", paddingTop: 80}}>
-              <AnimatedTitle
-                text={hook}
-                fontSize={48}
-                fontWeight={800}
-                color="#ffffff"
-                enterAnimation="slideDown"
-                exitAnimation="fade"
-                enterDuration={12}
-                holdDuration={60}
-                exitDuration={12}
-                textShadow="0 2px 16px rgba(0,0,0,0.9)"
-              />
-            </AbsoluteFill>
-          </SafeArea>
+        <Sequence from={0} durationInFrames={75}>
+          <AbsoluteFill style={{justifyContent: "center", alignItems: "center", paddingLeft: 60, paddingRight: 60}}>
+            <AnimatedTitle
+              text={hook}
+              fontSize={96}
+              fontWeight={900}
+              color="#ffffff"
+              enterAnimation="scale"
+              exitAnimation="fade"
+              enterDuration={8}
+              holdDuration={55}
+              exitDuration={10}
+              textShadow={[
+                "-3px -3px 0 #000",
+                " 3px -3px 0 #000",
+                "-3px  3px 0 #000",
+                " 3px  3px 0 #000",
+                " 0    6px 0 #000",
+              ].join(",")}
+              letterSpacing={-1}
+            />
+          </AbsoluteFill>
         </Sequence>
       )}
 
@@ -146,14 +151,14 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
       {/* Progress bar */}
       <ProgressBar color={accentColor} height={3} position="bottom" />
 
-      {/* Brand watermark */}
+      {/* Brand watermark — topLeft to avoid right-side UI action buttons (120px blocked) */}
       <Watermark
         text={BRAND.handle}
-        corner="topRight"
-        opacity={0.45}
-        fontSize={13}
+        corner="topLeft"
+        opacity={0.5}
+        fontSize={14}
         color="#ffffff"
-        margin={28}
+        margin={40}
       />
     </AbsoluteFill>
   );

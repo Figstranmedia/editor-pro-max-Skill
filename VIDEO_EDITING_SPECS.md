@@ -460,7 +460,118 @@ Before exporting, verify:
 
 ---
 
-**Last Updated:** May 31, 2026
+## 1️⃣1️⃣ REELS / TIKTOK / SHORTS — TEXT & SAFE ZONE RULES (2026)
+
+> These rules are derived from current platform specs and top-performing creator patterns. Apply them to all vertical video (1080×1920).
+
+### Safe Zones — Exact Pixels (1080×1920)
+
+```
+┌─────────────────────────────────────────┐ ← 0px
+│  TOP BLOCKED: 250px                     │   (account name, follow button, status bar)
+├─────────────────────────────────────────┤ ← 250px  ← SAFE CONTENT STARTS
+│                                         │
+│   SAFE AREA: 1080 × 1320px             │
+│   (centered)                            │
+│                                         │
+│   Right edge –120px: action buttons    │
+│   (Like, Comment, Share, ⋯)            │
+│                                         │
+├─────────────────────────────────────────┤ ← 1570px ← SAFE CONTENT ENDS
+│  BOTTOM BLOCKED: 350px (Instagram)     │   (captions bar, audio name, like/share icons)
+│                  400px (TikTok)        │
+└─────────────────────────────────────────┤ ← 1920px
+```
+
+**Implementation in editor-pro-max:**
+- `CaptionOverlay` auto-detects vertical video and applies `bottom: 420px` safe offset
+- Never place text below `y=1520` or above `y=280` in a 1920px canvas
+- Right-side elements (watermark, CTAs) must be at least `130px` from the right edge
+
+---
+
+### Caption / Subtitle Rules
+
+| Property | Rule | Value |
+|---|---|---|
+| **Font size** | Readable at arm's length on 6" phone | 55–75pt (default: 68pt) |
+| **Font weight** | Always heavy | 800–900 |
+| **Font family** | Sans-serif only | Inter, Montserrat, Bebas Neue |
+| **Outline** | Mandatory — guarantees readability on any background | 3px black stroke |
+| **Lines per page** | Max 2 lines | Break at ~7 words |
+| **Chunk duration** | Word-by-word or 2–4 word groups | 600–900ms per chunk |
+| **Position** | Lower-middle third | `bottom: 420px` from base |
+| **Max width** | Never full width | 80–85% of frame |
+| **Highlight color** | Active word highlight | Yellow `#FFEE00` or green `#39E508` |
+| **Text color** | Base text | White `#ffffff` |
+
+**Forbidden:**
+- ❌ Thin fonts (< weight 600)
+- ❌ Script/decorative fonts for captions
+- ❌ Captions below y=1520 (hidden by platform UI)
+- ❌ More than 2 lines visible at once
+- ❌ Text right-aligned
+- ❌ Low-contrast text (no outline, light text on light bg)
+
+---
+
+### Hook Text Rules (First 2.5s)
+
+The hook is the most important element. 2026 standard:
+
+| Property | Rule |
+|---|---|
+| **Position** | **Dead center** of frame — not top, not bottom |
+| **Font size** | 80–120pt (large, dominant) |
+| **Duration** | 2–2.5s visible (60–75 frames @ 30fps) |
+| **Animation** | Scale-in (0.3s) → hold → fade (0.3s) |
+| **Style** | Heavy weight + black outline (same as karaoke preset) |
+| **Max words** | 5–8 words max |
+| **Color** | White with thick black outline |
+
+**Patterns that perform:**
+- Question: "Did you know this?" → center, 96pt
+- Stat: "90% of people fail here." → center, 88pt
+- Curiosity gap: "Wait until the end." → center, 96pt
+- Bold claim: "This changed everything." → center, 88pt
+
+---
+
+### Caption Presets — When to Use Each
+
+| Preset | Style | Best for |
+|---|---|---|
+| `karaoke` | Thick black outline + yellow highlight | **Default for Reels/TikTok/Shorts** — highest readability |
+| `bold` | Double drop shadow | Talking head, lifestyle content |
+| `outline` | Thin 2px outline | Clean minimal aesthetic |
+| `box` | Semi-transparent bg box | Gaming, tech, b-roll with busy background |
+| `glow` | Purple/indigo glow | Music, entertainment, aesthetic content |
+| `classic` | Simple shadow | Presentations, LinkedIn exports |
+
+---
+
+### Platform UI Action Zones — Do Not Place Content Here
+
+```
+TikTok (1080×1920):
+  Bottom-right cluster:  x=950–1080, y=1400–1800  (Like, Comment, Share, Sound)
+  Bottom bar:            y=1800–1920               (navigation + audio)
+  Top bar:               y=0–192                   (header + search)
+
+Instagram Reels (1080×1920):
+  Bottom action strip:   y=1570–1920               (like, comment, share, audio)
+  Right icons:           x=960–1080, y=800–1600     (Like, Comment, Share, ⋯)
+  Top username:          y=0–250                    (account + follow)
+
+YouTube Shorts (1080×1920):
+  Bottom controls:       y=1700–1920               (progress, like, dislike, subscribe)
+  Right sidebar:         x=940–1080, y=400–1700     (Like, Dislike, Comment, Share)
+  Top:                   y=0–120                    (status bar only)
+```
+
+---
+
+**Last Updated:** June 6, 2026
 **Version:** 1.0
 **Status:** Production Guidelines
 

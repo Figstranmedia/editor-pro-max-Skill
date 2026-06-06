@@ -15,7 +15,7 @@ import {
 } from "@remotion/captions";
 import {FONT_FAMILIES, loadGoogleFont} from "../../presets/fonts";
 
-export type CaptionPreset = "classic" | "bold" | "outline" | "glow" | "box";
+export type CaptionPreset = "classic" | "bold" | "outline" | "glow" | "box" | "karaoke";
 
 export interface CaptionOverlayProps {
   captionsSource: string;
@@ -66,23 +66,42 @@ const PRESET_STYLES: Record<CaptionPreset, {
     stroke: "none",
     highlightBg: "rgba(99,102,241,0.9)",
   },
+  // Dominant 2026 Reels/TikTok style: thick black outline + yellow/green word highlight
+  karaoke: {
+    bg: "transparent",
+    shadow: [
+      "-3px -3px 0 #000",
+      " 3px -3px 0 #000",
+      "-3px  3px 0 #000",
+      " 3px  3px 0 #000",
+      " 0px  4px 0 #000",
+    ].join(","),
+    stroke: "none",
+    highlightBg: "transparent",
+  },
 };
 
 export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   captionsSource,
   preset = "bold",
   position = "bottom",
-  fontSize = 64,
+  fontSize = 68,
   fontFamily = FONT_FAMILIES.heading,
-  highlightColor = "#39E508",
+  highlightColor = "#FFEE00",
   textColor = "#ffffff",
-  combineTokensWithinMs = 1200,
+  combineTokensWithinMs = 800,
   offsetMs = 0,
   style,
 }) => {
   const [captions, setCaptions] = useState<Caption[] | null>(null);
   const [handle] = useState(() => delayRender("Loading captions"));
-  const {fps} = useVideoConfig();
+  const {fps, width, height} = useVideoConfig();
+
+  // Auto safe zone: vertical video (Reels/TikTok/Shorts) has UI elements covering
+  // bottom ~400px and top ~250px. Horizontal video uses smaller offsets.
+  const isVertical = height > width;
+  const safeBottom = isVertical ? 420 : 80;
+  const safeTop = isVertical ? 260 : 80;
 
   const fontName = fontFamily.replace(/'/g, "").split(",")[0].trim();
   loadGoogleFont(fontName);
@@ -117,9 +136,9 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   if (!captions) return null;
 
   const positionStyles: React.CSSProperties = {
-    top: {top: 80},
+    top: {top: safeTop},
     center: {top: "50%", transform: "translateY(-50%)"},
-    bottom: {bottom: 120},
+    bottom: {bottom: safeBottom},
   }[position];
 
   const presetStyle = PRESET_STYLES[preset];
@@ -202,9 +221,10 @@ const CaptionPage: React.FC<CaptionPageProps> = ({
         style={{
           fontSize,
           fontFamily,
-          fontWeight: 800,
-          lineHeight: 1.3,
+          fontWeight: preset === "karaoke" ? 900 : 800,
+          lineHeight: 1.25,
           whiteSpace: "pre",
+          letterSpacing: preset === "karaoke" ? "0.01em" : "normal",
         }}
       >
         {page.tokens.map((token, i) => {
