@@ -22,6 +22,7 @@ import {BeforeAfterDemo} from "./compositions/BeforeAfterDemo";
 // Editing templates
 import {TalkingHeadEdit} from "./templates/editing/TalkingHeadEdit";
 import {PodcastClip} from "./templates/editing/PodcastClip";
+import {YouTubeShortClip, calculateMetadata as youtubeShortMetadata} from "./compositions/YouTubeShortClip";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -163,6 +164,22 @@ export const RemotionRoot: React.FC = () => {
             clipEndSeconds: 30,
             showCaptions: true,
             captionPreset: "bold" as const,
+          }}
+        />
+        <Composition
+          id="YouTubeShortClip"
+          component={YouTubeShortClip}
+          calculateMetadata={youtubeShortMetadata}
+          durationInFrames={900}
+          fps={30}
+          width={1080}
+          height={1920}
+          defaultProps={{
+            segmentIndex: 0,
+            showCaptions: true,
+            showHook: true,
+            captionPreset: "bold" as const,
+            accentColor: "#6366f1",
           }}
         />
       </Folder>

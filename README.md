@@ -8,7 +8,7 @@
 
 Built with Remotion + Claude Code | React 19 | TypeScript | Whisper AI
 
-![Editor Pro Max — Landing Page](assets/landing-hero-es.png)
+![Editor Pro Max Skill](editor-pro-max-skill-banner.png)
 
 [English](#english) | [Espanol](#espanol)
 

@@ -6,9 +6,13 @@ description: >
   YouTube Short, presentation, testimonial, announcement, or promo clip — even if they
   just describe a concept in natural language. Also use when editing footage: removing
   silences, adding captions, extracting podcast clips, or creating talking-head edits.
+  ALSO trigger when the user shares a YouTube URL and asks for shorts, clips, reels,
+  or "best moments" — use the YouTube → Shorts pipeline (youtube-to-shorts.ts) for this.
   Trigger any time the user says things like "make me a video", "create a clip about my
   project", "edit this footage", "add captions", "remove the pauses", "render for TikTok",
-  "promote my product with a video", or "I need a social media video about this."
+  "promote my product with a video", "I need a social media video about this",
+  "take this YouTube video and make N shorts", "extract the best clips from this video",
+  or pastes a youtube.com / youtu.be URL with a request for clips or shorts.
   The skill reads the current project context, generates a Remotion composition, and
   exports the rendered MP4 to the user's project folder at videos/renders/.
 ---
@@ -175,15 +179,28 @@ Pacing reference: 6–15s video → cut every 1.5–2.5s. 15–30s → every 2�
 <Announcement preTitle="Introducing" title="Product" subtitle="Tagline" cta="Learn More" />
 ```
 
-### Registered promotional compositions (ready to render)
+### Registered compositions (ready to render)
 
 These exist in editor-pro-max and can be rendered immediately:
 
 | ID | Format | Duration | Use for |
 |---|---|---|---|
+| `YouTubeShortClip` | 1080×1920 | dynamic | YouTube → Shorts pipeline output |
+| `PodcastClip` | 1080×1920 | custom | Manual clip extraction |
+| `TalkingHeadEdit` | 1920×1080 | custom | Talking head with silence removal |
 | `editor-pro-max-promo-master` | 1920×1080 | 90s | YouTube master |
 | `editor-pro-max-promo-tiktok` | 1080×1920 | 30s | TikTok / Reel |
 | `editor-pro-max-promo-linkedin` | 1200×628 | 45s | LinkedIn |
+
+**`YouTubeShortClip` props:**
+```bash
+# segmentIndex — which segment from public/segments.json to render (0-based)
+--props='{"segmentIndex":0}'
+
+# Optional overrides:
+--props='{"segmentIndex":1,"captionPreset":"glow","accentColor":"#ff0050","showHook":false}'
+```
+Available `captionPreset` values: `classic`, `bold`, `outline`, `glow`, `box`
 
 ---
 
@@ -275,6 +292,72 @@ Available: `crossfade`, `fadeQuick`, `fadeSlow`, `slideLeft`, `slideRight`, `sli
 - **Colors**: palettes `dark`, `light`, `vibrant`, `warm`, `cool`, `neon`
 - **Fonts**: `heading` (Inter), `mono` (JetBrains Mono), `display` (Poppins), `elegant` (Playfair Display). Always call `loadDefaultFonts()`.
 - **Easings**: `easeIn`, `easeOut`, `easeInOut`, `bounceOut`, `elastic`, `backOut`, `sharp`, `smooth`, `snappy`
+
+---
+
+## YouTube → Shorts (automated pipeline)
+
+When the user shares a YouTube URL and asks for N shorts/clips, use the single orchestrator:
+
+```bash
+cd /Users/<user>/Desktop/editor-pro-max-Skill
+
+# Full pipeline: download → transcribe → select → print render commands
+npx tsx scripts/youtube-to-shorts.ts "<youtube-url>" <count> [max-duration-seconds]
+
+# Examples:
+npx tsx scripts/youtube-to-shorts.ts "https://youtube.com/watch?v=XYZ" 3
+npx tsx scripts/youtube-to-shorts.ts "https://youtu.be/ABC" 5 60
+```
+
+**Prerequisite:** `yt-dlp` must be installed. Check with `yt-dlp --version`.
+If missing, tell the user: `brew install yt-dlp` (macOS) or `pip install yt-dlp`.
+
+### What the pipeline does automatically
+1. Downloads video → `public/assets/video.mp4`
+2. Extracts audio → `public/assets/audio.wav`
+3. Transcribes with Whisper → `public/captions.json`
+4. Detects silence → `public/silence.json`
+5. **Selects best N segments** via Claude Haiku (or heuristics if no API key) → `public/segments.json`
+6. Prints ready-to-run render commands
+
+### Rendering the shorts
+
+After the pipeline, render each short by `segmentIndex`:
+
+```bash
+# Render short 0
+npx remotion render YouTubeShortClip "out/short_0.mp4" --props='{"segmentIndex":0}'
+
+# Render short 1
+npx remotion render YouTubeShortClip "out/short_1.mp4" --props='{"segmentIndex":1}'
+
+# Render to user's project folder
+npx remotion render YouTubeShortClip "/abs/path/user-project/videos/renders/short_0.mp4" \
+  --props='{"segmentIndex":0}'
+```
+
+The `YouTubeShortClip` composition auto-reads `public/segments.json` via `calculateMetadata`
+and sets the correct duration/trim for each segment. Each short includes:
+- Video trimmed to the segment
+- Word-level captions synced to the clip offset
+- Hook text overlay at the start
+- Progress bar + brand watermark
+
+### Skipping steps (re-runs)
+
+The orchestrator skips steps whose output files already exist. To re-run a step, delete its output:
+```bash
+rm public/captions.json    # re-transcribe
+rm public/segments.json    # re-select segments (different count or criteria)
+rm public/assets/video.mp4 # re-download (e.g. different URL)
+```
+
+### ANTHROPIC_API_KEY for smart selection
+
+If `ANTHROPIC_API_KEY` is set in the environment, segment selection uses Claude Haiku
+to pick the most self-contained, hook-worthy moments. Without it, falls back to
+a speech-density heuristic (still good, but less context-aware).
 
 ---
 
