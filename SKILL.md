@@ -18,18 +18,38 @@ user's project at `videos/YYYY-MM-DD/topic.mp4`.
 
 ---
 
-## Step 0 — MANDATORY: Verify engine
+## Step 0 — MANDATORY: Verify engine access
 
 Run before anything else:
 
 ```bash
 ls ~/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
-  && echo "ENGINE READY" || echo "ENGINE NOT READY"
+  && echo "ENGINE READY" \
+  || (ls ~/Desktop/editor-pro-max-Skill/ 2>/dev/null && echo "ENGINE NOT READY" || echo "SANDBOX MODE")
 ```
 
-**If ENGINE NOT READY:**
+**If ENGINE READY:** proceed with full pipeline (Steps 1–7 execute and render automatically).
+
+**If ENGINE NOT READY** (folder exists but `npm install` hasn't run):
 ```bash
 cd ~/Desktop/editor-pro-max-Skill && npm install
+```
+Then continue with Steps 1–7.
+
+**If SANDBOX MODE** (folder inaccessible — this is normal in Cowork):
+> The rendering engine is outside the sandbox. This is expected.
+> Continuing in **preparation mode**: Steps 1–5 run normally (brand analysis,
+> asset gathering, composition writing). At Step 6, deliver ready-to-run
+> terminal commands instead of executing the render directly.
+
+In preparation mode, Step 6 output looks like:
+```
+✓ Composition ready. Run these commands from your terminal:
+
+  cd ~/Desktop/editor-pro-max-Skill
+  cp /abs/path/to/user-project/videos/compositions/MyVideo.tsx src/compositions/
+  # Open src/Root.tsx and add: <Composition id="MyVideo" component={MyVideo} ... />
+  npx remotion render MyVideo /abs/path/to/user-project/videos/2026-06-07/reel-topic.mp4 --overwrite
 ```
 
 **NEVER fall back to ffmpeg drawtext.** ffmpeg cannot produce animated captions, karaoke
