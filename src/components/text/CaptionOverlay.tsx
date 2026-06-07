@@ -14,6 +14,7 @@ import {
   type TikTokPage,
 } from "@remotion/captions";
 import {FONT_FAMILIES, loadGoogleFont} from "../../presets/fonts";
+import {useVideoFormat} from "../../hooks/useVideoFormat";
 
 export type CaptionPreset = "classic" | "bold" | "outline" | "glow" | "box" | "karaoke";
 
@@ -21,7 +22,7 @@ export interface CaptionOverlayProps {
   captionsSource: string;
   preset?: CaptionPreset;
   position?: "top" | "center" | "bottom";
-  fontSize?: number;
+  fontSize?: number;        // if omitted, auto-calculated from canvas width
   fontFamily?: string;
   highlightColor?: string;
   textColor?: string;
@@ -85,7 +86,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   captionsSource,
   preset = "bold",
   position = "bottom",
-  fontSize = 68,
+  fontSize,
   fontFamily = FONT_FAMILIES.heading,
   highlightColor = "#FFEE00",
   textColor = "#ffffff",
@@ -95,13 +96,11 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
 }) => {
   const [captions, setCaptions] = useState<Caption[] | null>(null);
   const [handle] = useState(() => delayRender("Loading captions"));
-  const {fps, width, height} = useVideoConfig();
+  const {fps} = useVideoConfig();
 
-  // Auto safe zone: vertical video (Reels/TikTok/Shorts) has UI elements covering
-  // bottom ~400px and top ~250px. Horizontal video uses smaller offsets.
-  const isVertical = height > width;
-  const safeBottom = isVertical ? 420 : 80;
-  const safeTop = isVertical ? 260 : 80;
+  const format = useVideoFormat();
+  const resolvedFontSize = fontSize ?? format.typography.captionSize;
+  const {safeZone, typography} = format;
 
   const fontName = fontFamily.replace(/'/g, "").split(",")[0].trim();
   loadGoogleFont(fontName);
@@ -136,9 +135,9 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   if (!captions) return null;
 
   const positionStyles: React.CSSProperties = {
-    top: {top: safeTop},
+    top:    {top: safeZone.top},
     center: {top: "50%", transform: "translateY(-50%)"},
-    bottom: {bottom: safeBottom},
+    bottom: {bottom: safeZone.bottom},
   }[position];
 
   const presetStyle = PRESET_STYLES[preset];
@@ -168,12 +167,13 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
           <Sequence key={index} from={startFrame} durationInFrames={duration}>
             <CaptionPage
               page={page}
-              fontSize={fontSize}
+              fontSize={resolvedFontSize}
               fontFamily={fontFamily}
               textColor={textColor}
               highlightColor={highlightColor}
               presetStyle={presetStyle}
               preset={preset}
+              maxWidth={typography.maxWidth}
             />
           </Sequence>
         );
@@ -190,6 +190,7 @@ interface CaptionPageProps {
   highlightColor: string;
   presetStyle: typeof PRESET_STYLES[CaptionPreset];
   preset: CaptionPreset;
+  maxWidth: number;
 }
 
 const CaptionPage: React.FC<CaptionPageProps> = ({
@@ -200,6 +201,7 @@ const CaptionPage: React.FC<CaptionPageProps> = ({
   highlightColor,
   presetStyle,
   preset,
+  maxWidth,
 }) => {
   const frame = useCurrentFrame();
   const {fps} = useVideoConfig();
@@ -211,7 +213,7 @@ const CaptionPage: React.FC<CaptionPageProps> = ({
     <div
       style={{
         textAlign: "center",
-        maxWidth: "85%",
+        maxWidth,
         padding: preset === "box" ? "12px 20px" : 0,
         borderRadius: preset === "box" ? 8 : 0,
         backgroundColor: preset === "box" ? presetStyle.bg : "transparent",

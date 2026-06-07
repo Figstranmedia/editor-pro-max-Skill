@@ -8,6 +8,7 @@ import {SafeArea} from "../components/layout/SafeArea";
 import {Watermark} from "../components/overlays/Watermark";
 import {loadDefaultFonts} from "../presets/fonts";
 import {BRAND} from "../presets/brand";
+import {useVideoFormat} from "../hooks/useVideoFormat";
 
 export interface YouTubeShortClipProps extends Record<string, unknown> {
   segmentIndex?: number;
@@ -74,6 +75,7 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
   showHook = true,
 }) => {
   loadDefaultFonts();
+  const {typography, safeZone} = useVideoFormat();
 
   const src = staticFile(videoSrc);
   const captionsPath = "captions.json";
@@ -99,13 +101,13 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
         />
       )}
 
-      {/* Hook text — centered in frame (2026 Reels standard: dead center, 80-120pt) */}
+      {/* Hook text — centered in frame (2026 Reels standard: dead center, proportional to canvas) */}
       {showHook && hook && (
         <Sequence from={0} durationInFrames={75}>
-          <AbsoluteFill style={{justifyContent: "center", alignItems: "center", paddingLeft: 60, paddingRight: 60}}>
+          <AbsoluteFill style={{justifyContent: "center", alignItems: "center", paddingLeft: safeZone.left, paddingRight: safeZone.right}}>
             <AnimatedTitle
               text={hook}
-              fontSize={96}
+              fontSize={typography.hookSize}
               fontWeight={900}
               color="#ffffff"
               enterAnimation="scale"
@@ -130,10 +132,10 @@ export const YouTubeShortClip: React.FC<YouTubeShortClipProps> = ({
       {!showCaptions && title && (
         <Sequence from={0} durationInFrames={75}>
           <SafeArea>
-            <AbsoluteFill style={{justifyContent: "flex-end", alignItems: "center", paddingBottom: 120}}>
+            <AbsoluteFill style={{justifyContent: "flex-end", alignItems: "center", paddingBottom: safeZone.bottom}}>
               <AnimatedTitle
                 text={title}
-                fontSize={38}
+                fontSize={typography.bodySize}
                 fontWeight={700}
                 color="#ffffff"
                 enterAnimation="slideUp"
