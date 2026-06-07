@@ -27,9 +27,9 @@ You create videos **from the user's project content**. You are operating in **Ex
 
 The rendering engine lives at:
 ```
-/Users/<user>/Desktop/editor-pro-max-Skill/
+/Users/rafafigueroa/Desktop/editor-pro-max-Skill/
 ```
-Adjust this path if the user has it elsewhere. All component imports reference this path.
+This is the confirmed absolute path on this machine.
 
 ---
 
@@ -39,13 +39,13 @@ Before doing anything else, verify the engine exists and has its dependencies in
 
 ```bash
 # Check engine exists and node_modules are present
-ls /Users/<user>/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
+ls /Users/rafafigueroa/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
   && echo "ENGINE READY" || echo "ENGINE NOT READY"
 ```
 
 **If ENGINE NOT READY:**
 ```bash
-cd /Users/<user>/Desktop/editor-pro-max-Skill
+cd /Users/rafafigueroa/Desktop/editor-pro-max-Skill
 npm install
 ```
 This takes 1-2 minutes on first run. Do NOT skip it — without node_modules, Remotion cannot render anything and fallbacks like ffmpeg drawtext will produce inferior results (no animations, no word-by-word captions, no karaoke preset).
@@ -113,10 +113,10 @@ Write `videos/compositions/MyVideo.tsx`. Import from Editor Pro Max using its ab
 import {AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Sequence, staticFile} from "remotion";
 
 // Editor Pro Max components — adjust path to match installation
-import {TikTokVideo} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/templates/social/TikTokVideo";
-import {AnimatedTitle} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/components/text/AnimatedTitle";
-import {GradientBackground} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/components/backgrounds/GradientBackground";
-import {loadDefaultFonts} from "/Users/<user>/Desktop/editor-pro-max-Skill/src/presets/fonts";
+import {TikTokVideo} from "/Users/rafafigueroa/Desktop/editor-pro-max-Skill/src/templates/social/TikTokVideo";
+import {AnimatedTitle} from "/Users/rafafigueroa/Desktop/editor-pro-max-Skill/src/components/text/AnimatedTitle";
+import {GradientBackground} from "/Users/rafafigueroa/Desktop/editor-pro-max-Skill/src/components/backgrounds/GradientBackground";
+import {loadDefaultFonts} from "/Users/rafafigueroa/Desktop/editor-pro-max-Skill/src/presets/fonts";
 
 loadDefaultFonts();
 
@@ -134,12 +134,12 @@ export const MyVideo: React.FC = () => { ... };
 ```bash
 # 1. Copy the composition into editor-pro-max
 cp {user-project}/videos/compositions/MyVideo.tsx \
-   /Users/<user>/Desktop/editor-pro-max-Skill/src/compositions/
+   /Users/rafafigueroa/Desktop/editor-pro-max-Skill/src/compositions/
 
 # 2. Register it in Root.tsx (add the Composition block)
 
 # 3. Render — output goes back to the user's project
-cd /Users/<user>/Desktop/editor-pro-max-Skill
+cd /Users/rafafigueroa/Desktop/editor-pro-max-Skill
 npx remotion render MyVideo \
   /absolute/path/to/user-project/videos/renders/my-video.mp4
 ```
@@ -327,7 +327,7 @@ Available: `crossfade`, `fadeQuick`, `fadeSlow`, `slideLeft`, `slideRight`, `sli
 When the user shares a YouTube URL and asks for N shorts/clips, use the single orchestrator:
 
 ```bash
-cd /Users/<user>/Desktop/editor-pro-max-Skill
+cd /Users/rafafigueroa/Desktop/editor-pro-max-Skill
 
 # Full pipeline: download → transcribe → select → print render commands
 npx tsx scripts/youtube-to-shorts.ts "<youtube-url>" <count> [max-duration-seconds]
@@ -393,7 +393,7 @@ a speech-density heuristic (still good, but less context-aware).
 Run the pipeline first (from inside editor-pro-max, pointing to the user's asset):
 
 ```bash
-cd /Users/<user>/Desktop/editor-pro-max-Skill
+cd /Users/rafafigueroa/Desktop/editor-pro-max-Skill
 npx tsx scripts/analyze-video.ts /abs/path/to/user-project/videos/assets/video.mp4
 npx tsx scripts/extract-audio.ts /abs/path/to/user-project/videos/assets/video.mp4
 npx tsx scripts/transcribe.ts
