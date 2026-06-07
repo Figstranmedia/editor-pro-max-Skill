@@ -18,39 +18,48 @@ user's project at `videos/YYYY-MM-DD/topic.mp4`.
 
 ---
 
-## Step 0 — MANDATORY: Verify engine access
+## Step 0 — MANDATORY: Verify Remotion in user's project
 
-Run before anything else:
+Check if the user's project already has a `videos/` Remotion setup:
 
 ```bash
-ls ~/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
-  && echo "ENGINE READY" \
-  || (ls ~/Desktop/editor-pro-max-Skill/ 2>/dev/null && echo "ENGINE NOT READY" || echo "SANDBOX MODE")
+ls videos/node_modules/.bin/remotion 2>/dev/null \
+  && echo "ENGINE READY" || echo "ENGINE NOT READY"
 ```
 
-**If ENGINE READY:** proceed with full pipeline (Steps 1–7 execute and render automatically).
+**If ENGINE NOT READY:** create the setup and install:
 
-**If ENGINE NOT READY** (folder exists but `npm install` hasn't run):
 ```bash
-cd ~/Desktop/editor-pro-max-Skill && npm install
-```
-Then continue with Steps 1–7.
+mkdir -p videos/compositions videos/out videos/assets videos/public
 
-**If SANDBOX MODE** (folder inaccessible — this is normal in Cowork):
-> The rendering engine is outside the sandbox. This is expected.
-> Continuing in **preparation mode**: Steps 1–5 run normally (brand analysis,
-> asset gathering, composition writing). At Step 6, deliver ready-to-run
-> terminal commands instead of executing the render directly.
+cat > videos/package.json << 'EOF'
+{
+  "name": "videos",
+  "version": "1.0.0",
+  "scripts": {
+    "render": "remotion render",
+    "studio": "remotion studio"
+  },
+  "dependencies": {
+    "remotion": "^4.0.0",
+    "@remotion/transitions": "^4.0.0",
+    "@remotion/media-utils": "^4.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}
+EOF
 
-In preparation mode, Step 6 output looks like:
+cd videos && npm install
 ```
-✓ Composition ready. Run these commands from your terminal:
 
-  cd ~/Desktop/editor-pro-max-Skill
-  cp /abs/path/to/user-project/videos/compositions/MyVideo.tsx src/compositions/
-  # Open src/Root.tsx and add: <Composition id="MyVideo" component={MyVideo} ... />
-  npx remotion render MyVideo /abs/path/to/user-project/videos/2026-06-07/reel-topic.mp4 --overwrite
-```
+**If ENGINE READY:** proceed directly — no install needed.
+
+`videos/node_modules/` is created once and reused across all future sessions.
 
 **NEVER fall back to ffmpeg drawtext.** ffmpeg cannot produce animated captions, karaoke
 word highlighting, spring-animated hooks, or lower thirds. If Remotion is slow, let it
@@ -60,24 +69,51 @@ finish — a 30s clip takes 2–5 min locally. Do not abort.
 
 ## Step 1 — Analyze project brand
 
-Scan the user's project to extract brand identity before writing any code:
+**First:** check if `videos/brand.json` already exists:
+
+```bash
+cat videos/brand.json 2>/dev/null
+```
+
+**If it exists:** load it directly and skip the scan below. Only re-scan if the user
+explicitly asks to update the brand profile.
+
+**If it doesn't exist:** scan the project and create it:
 
 ```bash
 ls
 cat README.md 2>/dev/null | head -40
 find . \( -name "*.json" -o -name "*.md" \) -not -path "*/node_modules/*" | head -10
 find . \( -name "*.png" -o -name "*.jpg" -o -name "*.svg" \) | grep -v node_modules | head -20
-find . -name "*.mp4" -o -name "*.mov" | grep -v node_modules | head -10
+find . \( -name "*.mp4" -o -name "*.mov" \) | grep -v node_modules | head -10
 ```
 
-Extract and record:
-- **Brand name** and tagline
-- **Color palette** (primary, secondary, background, accent)
-- **Typography** (font families, weights in use)
-- **Logo path** (relative to project root)
-- **Existing footage** (video files available)
-- **Existing images** (photos, illustrations, graphics)
-- **Tone** (formal, casual, spiritual, technical, etc.)
+Extract brand identity and write `videos/brand.json` (one file per project, reused forever):
+
+```json
+{
+  "name": "Project name",
+  "tagline": "...",
+  "colors": {
+    "background": "#000000",
+    "primary": "#ffffff",
+    "accent": "#6366f1",
+    "text": "#ffffff"
+  },
+  "typography": {
+    "heading": "Inter",
+    "body": "Inter",
+    "weights": [400, 700, 900]
+  },
+  "tone": "professional, direct, no exclamation marks",
+  "logo": "assets/logo.png",
+  "footage": ["assets/video.mp4"],
+  "images": ["assets/photo.jpg"]
+}
+```
+
+All subsequent steps read brand values from `videos/brand.json` — colors, fonts, tone,
+assets — so every video is automatically on-brand without re-scanning the project.
 
 ---
 
@@ -190,65 +226,75 @@ Key rules to check for every video:
 
 ## Step 5 — Build the composition
 
-Write the composition file using Editor Pro Max components. Import from the engine's
-absolute path:
+Write the composition at `videos/compositions/MyVideo.tsx`. Use only Remotion core —
+no external engine dependencies. Read brand values from `videos/brand.json`:
 
 ```tsx
-import {AbsoluteFill, Sequence, staticFile, useCurrentFrame, useVideoConfig, spring, interpolate} from "remotion";
-import {AnimatedTitle} from "../components/text/AnimatedTitle";
-import {CaptionOverlay} from "../components/text/CaptionOverlay";
-import {GradientBackground} from "../components/backgrounds/GradientBackground";
-import {FitImage} from "../components/media/FitImage";
-import {ProgressBar} from "../components/overlays/ProgressBar";
-import {Watermark} from "../components/overlays/Watermark";
-import {useVideoFormat} from "../hooks/useVideoFormat";
-import {loadDefaultFonts} from "../presets/fonts";
+import {
+  AbsoluteFill, Sequence, staticFile,
+  useCurrentFrame, useVideoConfig,
+  spring, interpolate, Audio, Video, Img
+} from "remotion";
+
+// Brand colors come from videos/brand.json (loaded at build time or passed as props)
+const BRAND = {
+  bg: "#020408",       // colors.background
+  primary: "#c9a84c",  // colors.primary
+  accent: "#a78bfa",   // colors.accent
+  text: "#d4dde8",     // colors.text
+};
 ```
 
 **Animation rules (non-negotiable):**
 - Always `useCurrentFrame()` — never CSS transitions (causes flickering)
 - Always clamp: `extrapolateRight: "clamp"`
 - Use `spring()` for natural motion, `interpolate()` for precise control
-- Use `useVideoFormat()` for all safe zone and font size values — never hardcode pixels
+- Safe zone values from Step 4 — apply as constants, not hardcoded guesses
 
-**Place the composition file** inside editor-pro-max, then register it in `Root.tsx`:
-```bash
-# Copy composition to engine
-cp {user-project}/videos/compositions/MyVideo.tsx \
-   ~/Desktop/editor-pro-max-Skill/src/compositions/
-
-# Register in Root.tsx (add the <Composition> block)
+**Create Root entry if it doesn't exist** (`videos/src/index.tsx`):
+```tsx
+import { registerRoot } from "remotion";
+import { RemotionRoot } from "./Root";
+registerRoot(RemotionRoot);
 ```
 
-**For YouTube → Shorts (Mode B):** use the existing `YouTubeShortClip` composition.
-No new composition needed — it reads from `public/segments.json` automatically.
+Register each new composition in `videos/src/Root.tsx`:
+```tsx
+import { Composition } from "remotion";
+import { MyVideo } from "../compositions/MyVideo";
+
+export const RemotionRoot = () => (
+  <>
+    <Composition id="MyVideo" component={MyVideo}
+      durationInFrames={900} fps={30} width={1080} height={1920} />
+  </>
+);
 
 ---
 
 ## Step 6 — Render to user's project
 
-Output folder uses the current date and a short topic slug derived from the content:
+Output folder uses the current date and a short topic slug:
 
 ```bash
 DATE=$(date +%Y-%m-%d)
-TOPIC="reel-brand-launch"   # ← short slug from content (no spaces, lowercase, hyphens)
-OUTPUT_DIR="/abs/path/to/user-project/videos/$DATE"
-mkdir -p "$OUTPUT_DIR"
+TOPIC="reel-brand-launch"   # ← slug from content: lowercase, hyphens, no spaces
+mkdir -p "videos/$DATE"
 
-cd ~/Desktop/editor-pro-max-Skill
-npx remotion render MyVideo "$OUTPUT_DIR/$TOPIC.mp4" --overwrite
+cd videos
+npx remotion render MyVideo "../videos/$DATE/$TOPIC.mp4" --overwrite
 ```
 
 **For YouTube → Shorts:**
 ```bash
 DATE=$(date +%Y-%m-%d)
-OUTPUT_DIR="/abs/path/to/user-project/videos/$DATE"
-mkdir -p "$OUTPUT_DIR"
+mkdir -p "videos/$DATE"
 
-npx remotion render YouTubeShortClip "$OUTPUT_DIR/short_0.mp4" \
+cd videos
+npx remotion render YouTubeShortClip "../videos/$DATE/short_0.mp4" \
   --props='{"segmentIndex":0}' --overwrite
 
-npx remotion render YouTubeShortClip "$OUTPUT_DIR/short_1.mp4" \
+npx remotion render YouTubeShortClip "../videos/$DATE/short_1.mp4" \
   --props='{"segmentIndex":1}' --overwrite
 ```
 
@@ -259,6 +305,9 @@ npx remotion render YouTubeShortClip "$OUTPUT_DIR/short_1.mp4" \
 | TikTok / Instagram Reel / YouTube Short | 1080 | 1920 | 30 |
 | YouTube / Presentation / LinkedIn | 1920 | 1080 | 30 |
 | Square (IG Post / X) | 1080 | 1080 | 30 |
+
+> `videos/node_modules/` is created once on first use and reused across all future
+> sessions — subsequent renders skip the install step entirely.
 
 ---
 
