@@ -18,13 +18,27 @@ You create videos **from the user's project content**. You are operating in **Ex
 
 ---
 
+## Execution context requirement
+
+**This skill requires Claude Code** (the CLI that runs on the user's local machine).
+It will NOT work inside Cowork or any sandboxed environment that restricts filesystem access.
+
+If you are running inside a sandbox (e.g. Cowork), you will see errors like:
+- "cannot access ~/Desktop/editor-pro-max-Skill/"
+- "node_modules not found"
+- ENGINE NOT READY even after install
+
+**What to do:** Tell the user to open this skill in Claude Code directly (`claude` CLI or Claude desktop app), not inside another agent/sandbox. The rendering engine must be on the same machine with full filesystem access.
+
+---
+
 ## Editor Pro Max location
 
 The rendering engine lives at:
 ```
 ~/Desktop/editor-pro-max-Skill/
 ```
-`~` expands to the current user's home directory. On macOS this is `/Users/<your-username>/`. All shell commands below use `~` so they work on any machine.
+`~` expands to the current user's home directory. On macOS: `/Users/<your-username>/`. All shell commands use `~` so they work on any machine with full filesystem access.
 
 ---
 
@@ -33,17 +47,17 @@ The rendering engine lives at:
 Before doing anything else, verify the engine exists and has its dependencies installed:
 
 ```bash
-# Check engine exists and node_modules are present
 ls ~/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
   && echo "ENGINE READY" || echo "ENGINE NOT READY"
 ```
 
 **If ENGINE NOT READY:**
 ```bash
-cd ~/Desktop/editor-pro-max-Skill
-npm install
+cd ~/Desktop/editor-pro-max-Skill && npm install
 ```
-This takes 1-2 minutes on first run. Do NOT skip it — without node_modules, Remotion cannot render anything and fallbacks like ffmpeg drawtext will produce inferior results (no animations, no word-by-word captions, no karaoke preset).
+Takes 1-2 min on first run. Do NOT skip — without node_modules Remotion cannot render and ffmpeg fallbacks produce inferior results.
+
+**If the path doesn't exist at all:** you are likely in a sandboxed environment (see above).
 
 **NEVER fall back to ffmpeg drawtext as a substitute for Remotion.** ffmpeg cannot produce:
 - Word-by-word caption highlighting (karaoke preset)
@@ -51,7 +65,7 @@ This takes 1-2 minutes on first run. Do NOT skip it — without node_modules, Re
 - Lower thirds with brand colors
 - Any animated text overlay
 
-If Remotion is slow, let it finish. Rendering a 30s clip at 30fps ≈ 2–5 minutes on a local machine. This is expected — do not abort.
+Rendering a 30s clip ≈ 2–5 minutes on a local machine. Expected — do not abort.
 
 ---
 
