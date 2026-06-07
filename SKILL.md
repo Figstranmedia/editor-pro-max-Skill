@@ -1,20 +1,15 @@
 ---
 name: editor-pro-max
 description: >
-  AI video editor that creates professional videos FROM the user's project content.
-  Use this skill whenever the user wants to create a video, TikTok, Instagram Reel,
-  YouTube Short, presentation, testimonial, announcement, or promo clip — even if they
-  just describe a concept in natural language. Also use when editing footage: removing
-  silences, adding captions, extracting podcast clips, or creating talking-head edits.
-  ALSO trigger when the user shares a YouTube URL and asks for shorts, clips, reels,
-  or "best moments" — use the YouTube → Shorts pipeline (youtube-to-shorts.ts) for this.
-  Trigger any time the user says things like "make me a video", "create a clip about my
-  project", "edit this footage", "add captions", "remove the pauses", "render for TikTok",
-  "promote my product with a video", "I need a social media video about this",
-  "take this YouTube video and make N shorts", "extract the best clips from this video",
-  or pastes a youtube.com / youtu.be URL with a request for clips or shorts.
-  The skill reads the current project context, generates a Remotion composition, and
-  exports the rendered MP4 to the user's project folder at videos/renders/.
+  AI video editor powered by Remotion. Use when the user wants to create a video,
+  TikTok, Instagram Reel, YouTube Short, presentation, testimonial, or promo clip —
+  even from a natural language description. Also use for footage editing: removing
+  silences, adding animated captions, extracting podcast clips, talking-head edits.
+  Trigger when the user shares a YouTube URL and asks for shorts or best moments —
+  runs the YouTube → Shorts pipeline automatically.
+  Keywords: make a video, create a clip, edit footage, add captions, remove pauses,
+  render for TikTok, extract shorts, youtube.com URL, youtu.be URL.
+  Renders MP4 via Remotion and exports to the user's project at videos/renders/.
 ---
 
 # Editor Pro Max — AI Video Creator
