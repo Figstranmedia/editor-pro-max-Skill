@@ -33,6 +33,33 @@ Adjust this path if the user has it elsewhere. All component imports reference t
 
 ---
 
+## Step 0 — MANDATORY: Verify engine is ready (run this first, always)
+
+Before doing anything else, verify the engine exists and has its dependencies installed:
+
+```bash
+# Check engine exists and node_modules are present
+ls /Users/<user>/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
+  && echo "ENGINE READY" || echo "ENGINE NOT READY"
+```
+
+**If ENGINE NOT READY:**
+```bash
+cd /Users/<user>/Desktop/editor-pro-max-Skill
+npm install
+```
+This takes 1-2 minutes on first run. Do NOT skip it — without node_modules, Remotion cannot render anything and fallbacks like ffmpeg drawtext will produce inferior results (no animations, no word-by-word captions, no karaoke preset).
+
+**NEVER fall back to ffmpeg drawtext as a substitute for Remotion.** ffmpeg cannot produce:
+- Word-by-word caption highlighting (karaoke preset)
+- Animated hooks (spring, scale, slideUp)
+- Lower thirds with brand colors
+- Any animated text overlay
+
+If Remotion is slow, let it finish. Rendering a 30s clip at 30fps ≈ 2–5 minutes on a local machine. This is expected — do not abort.
+
+---
+
 ## Step 1 — Read the user's project
 
 Scan the connected folder to understand the project before writing any video code:
