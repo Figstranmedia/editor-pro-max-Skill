@@ -139,6 +139,8 @@ npx tsx scripts/youtube-to-shorts.ts "<youtube-url>" <count> [max-duration-secon
 
 **Prerequisite:** `yt-dlp --version` must succeed. If missing: `brew install yt-dlp`.
 
+> **SANDBOX MODE:** This step requires terminal access. Output the commands above for the user to run manually from `~/Desktop/editor-pro-max-Skill`.
+
 The pipeline automatically:
 1. Downloads video → `public/assets/video.mp4`
 2. Extracts audio → `public/assets/audio.wav`
@@ -193,14 +195,14 @@ absolute path:
 
 ```tsx
 import {AbsoluteFill, Sequence, staticFile, useCurrentFrame, useVideoConfig, spring, interpolate} from "remotion";
-import {AnimatedTitle} from "~/Desktop/editor-pro-max-Skill/src/components/text/AnimatedTitle";
-import {CaptionOverlay} from "~/Desktop/editor-pro-max-Skill/src/components/text/CaptionOverlay";
-import {GradientBackground} from "~/Desktop/editor-pro-max-Skill/src/components/backgrounds/GradientBackground";
-import {FitImage} from "~/Desktop/editor-pro-max-Skill/src/components/media/FitImage";
-import {ProgressBar} from "~/Desktop/editor-pro-max-Skill/src/components/overlays/ProgressBar";
-import {Watermark} from "~/Desktop/editor-pro-max-Skill/src/components/overlays/Watermark";
-import {useVideoFormat} from "~/Desktop/editor-pro-max-Skill/src/hooks/useVideoFormat";
-import {loadDefaultFonts} from "~/Desktop/editor-pro-max-Skill/src/presets/fonts";
+import {AnimatedTitle} from "../components/text/AnimatedTitle";
+import {CaptionOverlay} from "../components/text/CaptionOverlay";
+import {GradientBackground} from "../components/backgrounds/GradientBackground";
+import {FitImage} from "../components/media/FitImage";
+import {ProgressBar} from "../components/overlays/ProgressBar";
+import {Watermark} from "../components/overlays/Watermark";
+import {useVideoFormat} from "../hooks/useVideoFormat";
+import {loadDefaultFonts} from "../presets/fonts";
 ```
 
 **Animation rules (non-negotiable):**
