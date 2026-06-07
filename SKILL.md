@@ -20,12 +20,22 @@ user's project at `videos/YYYY-MM-DD/topic.mp4`.
 
 ## Step 0 — MANDATORY: Verify Remotion in user's project
 
-Check if the user's project already has a `videos/` Remotion setup:
+Run both checks before anything else:
 
 ```bash
+# 1. Engine
 ls videos/node_modules/.bin/remotion 2>/dev/null \
   && echo "ENGINE READY" || echo "ENGINE NOT READY"
+
+# 2. Brand context
+ls videos/brand.json 2>/dev/null \
+  && echo "BRAND LOADED" || echo "BRAND NOT FOUND"
 ```
+
+**If BRAND LOADED:** this is a returning session — read `videos/brand.json` directly
+and skip the full project scan in Step 1. Brand identity is already known.
+
+**If BRAND NOT FOUND:** this is a new project — Step 1 will scan and create it.
 
 **If ENGINE NOT READY:** create the setup and install:
 
