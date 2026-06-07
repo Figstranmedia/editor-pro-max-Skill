@@ -20,15 +20,24 @@ You create videos **from the user's project content**. You are operating in **Ex
 
 ## Execution context requirement
 
-**This skill requires Claude Code** (the CLI that runs on the user's local machine).
-It will NOT work inside Cowork or any sandboxed environment that restricts filesystem access.
+**This skill requires Claude Code** (the CLI that runs on the user's local machine with full filesystem access). It will NOT work in Cowork or any sandboxed environment.
 
-If you are running inside a sandbox (e.g. Cowork), you will see errors like:
-- "cannot access ~/Desktop/editor-pro-max-Skill/"
-- "node_modules not found"
-- ENGINE NOT READY even after install
+### How to detect if you are in a sandbox
 
-**What to do:** Tell the user to open this skill in Claude Code directly (`claude` CLI or Claude desktop app), not inside another agent/sandbox. The rendering engine must be on the same machine with full filesystem access.
+Run this test:
+```bash
+ls ~/Desktop/editor-pro-max-Skill/node_modules/.bin/remotion 2>/dev/null \
+  && echo "ENGINE READY" || echo "SANDBOX — cannot access engine"
+```
+
+**If output is "SANDBOX":** Stop immediately. Do NOT suggest moving folders, copying files, or any workaround. Instead, respond to the user with this exact message:
+
+> "Este skill requiere Claude Code con acceso completo al filesystem.
+> Abre un chat nuevo en Claude Code (la app de escritorio o el CLI `claude`)
+> y pídeme lo mismo ahí — en ese contexto tengo acceso al engine y puedo
+> ejecutar el pipeline completo."
+
+Do not attempt to use ffmpeg as a fallback. Do not create compositions manually. Just send that message.
 
 ---
 
