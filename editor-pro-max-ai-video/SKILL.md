@@ -24,12 +24,25 @@ chunk render, report format) live in the master — reference them.
 
 **Prerequisite check:**
 ```bash
-# Load token from project .env.local if not already in environment
+# 1. Load token from project .env.local if not already in environment
 [ -z "$REPLICATE_API_TOKEN" ] && [ -f "videos/.env.local" ] && source videos/.env.local
 [ -z "$REPLICATE_API_TOKEN" ] && [ -f ".env.local" ] && source .env.local
 
-[ -n "$REPLICATE_API_TOKEN" ] && echo "Token OK" || echo "ERROR: REPLICATE_API_TOKEN not set — create videos/.env.local with REPLICATE_API_TOKEN=<token>"
+if [ -z "$REPLICATE_API_TOKEN" ]; then
+  echo "BLOCKED: REPLICATE_API_TOKEN not set"
+  echo "Fix: create videos/.env.local with REPLICATE_API_TOKEN=r8_..."
+  echo "Or ask the workshop Claude to copy it from editor-pro-max-Skill/.env.local"
+  exit 1
+fi
+echo "Token OK"
+
+# 2. ffmpeg
 ffmpeg -version > /dev/null 2>&1 && echo "ffmpeg OK" || echo "ERROR: ffmpeg not found — brew install ffmpeg"
+
+# 3. esbuild binary for current platform (sandbox may be Linux ARM64 even on Mac host)
+node -e "require('@esbuild/linux-arm64')" 2>/dev/null \
+  && echo "esbuild linux-arm64 OK" \
+  || (cd videos && npm install @esbuild/linux-arm64 --no-save && echo "esbuild linux-arm64 installed")
 ```
 
 **Engine rule (non-negotiable):** Remotion is the editor. ffmpeg is only a codec conversion
@@ -58,8 +71,10 @@ Break the topic into a short visual arc of **at most 3 motion segments** (one pr
 Each prompt is a cinematic shot built from brand identity:
 - Visual style: colors, tone, aesthetic from `brand.json`
 - Motion: slow cinematic pan, atmospheric — **no text in frame**
-- Aspect ratio: `9:16` for reels, `16:9` for horizontal
 - Duration: 5–6s per segment (typical model output)
+- **Aspect ratio note:** `minimax/video-01` outputs 16:9 regardless of prompt instructions.
+  Remotion's `objectFit: "cover"` crops it to 9:16 — works, but the crop depends on
+  where the subject sits. **Always prompt for centered subjects** to survive the crop.
 
 Example arc (dark spiritual palette, 3 segments):
 ```
@@ -239,9 +254,19 @@ import { HybridReel } from "../compositions/HybridReel";
 ```
 `durationInFrames` must match the calculated total below.
 
-**Total duration** = sum of every `Sequence` minus `(transitions × XFADE)`.
-Example above: `3×150 + 2×120 − 4×18 = 618` frames ≈ 20.6s. Use this for `durationInFrames`
-in Root.tsx. Other transitions: `slide()`, `wipe()` from `@remotion/transitions/slide|wipe`.
+**Total duration formula** — always recalculate from the actual sequences in the TSX:
+```
+TOTAL = (N_video × SEG) + (N_still × STILL) − (N_transitions × XFADE)
+N_transitions = N_video + N_still − 1
+```
+Example (3 video + 2 stills + 4 transitions):
+`(3×150) + (2×120) − (4×18) = 450 + 240 − 72 = 618` frames ≈ 20.6s
+
+**Do NOT estimate from seconds** — TransitionSeries overlaps reduce the total; off-by-one
+on transitions causes the last chunk to render empty or be truncated. Derive from the formula.
+
+Use this exact value for `durationInFrames` in Root.tsx and for the chunk range end (`TOTAL-1`).
+Other transitions: `slide()`, `wipe()` from `@remotion/transitions/slide|wipe`.
 
 ---
 
