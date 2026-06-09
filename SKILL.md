@@ -238,12 +238,14 @@ OUT="videos/out/$DATE"
 mkdir -p "$OUT" videos/chunks
 ```
 
-Issue ONE call per chunk (do NOT loop or parallelize — each call must stay short):
+Issue ONE call per chunk (do NOT loop or parallelize — each call must stay short).
+**Always set `REMOTION_CACHE_DIR=/tmp/remotion-cache`** — esbuild must write cache to /tmp,
+not to node_modules (which may be read-only or mount-restricted). Never patch node_modules.
 
 ```bash
-cd videos && npx remotion render MyReel "./chunks/chunk_0.mp4" --frames=0-119   --overwrite
-cd videos && npx remotion render MyReel "./chunks/chunk_1.mp4" --frames=120-239 --overwrite
-cd videos && npx remotion render MyReel "./chunks/chunk_2.mp4" --frames=240-359 --overwrite
+cd videos && REMOTION_CACHE_DIR=/tmp/remotion-cache npx remotion render MyReel "./chunks/chunk_0.mp4" --frames=0-119   --overwrite
+cd videos && REMOTION_CACHE_DIR=/tmp/remotion-cache npx remotion render MyReel "./chunks/chunk_1.mp4" --frames=120-239 --overwrite
+cd videos && REMOTION_CACHE_DIR=/tmp/remotion-cache npx remotion render MyReel "./chunks/chunk_2.mp4" --frames=240-359 --overwrite
 # ...continue until the final frame; last chunk ends at TOTAL_FRAMES-1
 ```
 

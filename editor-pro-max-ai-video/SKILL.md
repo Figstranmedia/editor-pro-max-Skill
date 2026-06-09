@@ -5,7 +5,7 @@ description: >
   (max 3, the expensive part); project stills fill the gaps with Ken Burns; a TransitionSeries
   stitches everything with crossfades/slides ("effects between videos"); brand chrome
   (watermark, captions, golden line, bottom tag) sits on top. Reuses same-day segments to
-  save API cost. Renders to a top-level "reels IA-<date>/" folder in the project.
+  save API cost. Renders to a top-level "reels IA-YYYY-MM-DD/" folder in the project.
   Invoked by the editor-pro-max master after brand analysis and routing.
   Triggers: "generate with AI", "make footage from scratch", Replicate, text-to-video,
   AI video, cinematic background from a prompt, hybrid AI + stills montage.
@@ -277,7 +277,13 @@ mkdir -p "$OUT" videos/chunks
 absolute path — `OUT="$PROJECT_PATH/reels IA-$DATE"` — and render with `--overwrite` against
 that absolute destination. Create the folder before concatenating.
 
-Render the chunks into `videos/chunks/` (one bash call each), then concatenate into `"$OUT"`:
+Render the chunks into `videos/chunks/` (one bash call each, with `REMOTION_CACHE_DIR=/tmp/remotion-cache`),
+then concatenate into `"$OUT"`. **Never patch node_modules for cache — use the env var.**
+
+```bash
+cd videos && REMOTION_CACHE_DIR=/tmp/remotion-cache npx remotion render HybridReel "../chunks/chunk_0.mp4" --frames=0-119 --overwrite
+# ...one call per chunk
+```
 
 ```bash
 ls videos/chunks/chunk_*.mp4 | sort -V | sed "s/^/file '/" | sed "s/$/'/" > /tmp/chunks.txt
