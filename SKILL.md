@@ -190,6 +190,10 @@ then route.
 | "use my images/footage", project assets, testimonial, presentation | **`editor-pro-max-brand-video`** | `videos/out/YYYY-MM-DD/` |
 | "generate with AI", "make footage from scratch", Replicate | **`editor-pro-max-ai-video`** | `reels IA-<date>/` (top-level) |
 
+> **Routing to `editor-pro-max-ai-video`:** ensure the project has a `videos/.env.local`
+> with `REPLICATE_API_TOKEN=<token>`. The sub-skill loads it automatically — no manual
+> `source` needed. Copy from `editor-pro-max-Skill/.env.local` if starting a new project.
+
 **Tiebreaker — brand-video vs ai-video:**
 If the user describes a video without mentioning YouTube or AI/Replicate:
 - User has images or footage in the project → **`editor-pro-max-brand-video`**

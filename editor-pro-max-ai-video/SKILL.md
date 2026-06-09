@@ -24,7 +24,11 @@ chunk render, report format) live in the master — reference them.
 
 **Prerequisite check:**
 ```bash
-[ -n "$REPLICATE_API_TOKEN" ] && echo "Token OK" || echo "ERROR: REPLICATE_API_TOKEN not set — add to .env.local"
+# Load token from project .env.local if not already in environment
+[ -z "$REPLICATE_API_TOKEN" ] && [ -f "videos/.env.local" ] && source videos/.env.local
+[ -z "$REPLICATE_API_TOKEN" ] && [ -f ".env.local" ] && source .env.local
+
+[ -n "$REPLICATE_API_TOKEN" ] && echo "Token OK" || echo "ERROR: REPLICATE_API_TOKEN not set — create videos/.env.local with REPLICATE_API_TOKEN=<token>"
 ffmpeg -version > /dev/null 2>&1 && echo "ffmpeg OK" || echo "ERROR: ffmpeg not found — brew install ffmpeg"
 ```
 
