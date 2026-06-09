@@ -294,7 +294,8 @@ Always animate with `useCurrentFrame()` — never CSS transitions (flickering).
 
 ### Report format (used by sub-skills on completion)
 ```
-✓ Rendered: videos/out/2026-06-07/my-reel.mp4 (32s, 41MB)
+✓ Rendered: videos/out/2026-06-07/my-reel.mp4 (32s, 41MB)      ← youtube-reel / brand-video
+✓ Rendered: "reels IA-2026-06-07/my-topic.mp4" (20s, 28MB)     ← ai-video
   Preview: cd videos && npx remotion studio
 ```
 

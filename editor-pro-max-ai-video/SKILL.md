@@ -226,6 +226,15 @@ export const HybridReel: React.FC = () => {
 };
 ```
 
+**Register in Root.tsx** (master's shared conventions show the full pattern):
+```tsx
+// videos/src/Root.tsx
+import { HybridReel } from "../compositions/HybridReel";
+<Composition id="HybridReel" component={HybridReel}
+  durationInFrames={618} fps={30} width={1080} height={1920} />
+```
+`durationInFrames` must match the calculated total below.
+
 **Total duration** = sum of every `Sequence` minus `(transitions × XFADE)`.
 Example above: `3×150 + 2×120 − 4×18 = 618` frames ≈ 20.6s. Use this for `durationInFrames`
 in Root.tsx. Other transitions: `slide()`, `wipe()` from `@remotion/transitions/slide|wipe`.
@@ -253,6 +262,7 @@ top-level `reels IA-<date>/` folder** (not `videos/out/`), so generated reels ar
 The space in the folder name means **every path must be quoted**.
 
 ```bash
+# Run from the project root — OUT is relative to CWD
 DATE=$(date +%Y-%m-%d)
 TOPIC="<topic-slug>"            # slug: lowercase, hyphens, no spaces
 OUT="reels IA-$DATE"           # ← top-level in the project root
