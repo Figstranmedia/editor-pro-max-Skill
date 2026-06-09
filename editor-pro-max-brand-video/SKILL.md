@@ -17,6 +17,13 @@ Build a video from assets that already exist in the project. Invoked by the
 request (topic, format, duration). Shared conventions (safe zones, codec rule, chunk render,
 report format) live in the master — reference them.
 
+**Prerequisite check:**
+```bash
+ffmpeg -version > /dev/null 2>&1 && echo "ffmpeg OK" || echo "ERROR: ffmpeg not found — brew install ffmpeg"
+```
+ffmpeg is used **only** for VP9/WebM codec conversion and chunk concatenation.
+Remotion is the editor — never use ffmpeg for compositing, text, or visual effects.
+
 ---
 
 ## Phase 1 — Scan available assets
@@ -69,7 +76,7 @@ Build the prompt from `brand.json` colors, tone, and visual style.
 
 ## Phase 4 — Build the composition
 
-Write `videos/compositions/<TopicSlug>.tsx`.
+Write `videos/compositions/<TopicSlug>.tsx`. **ID must use camelCase or hyphens — no underscores** (`BrandPromo` ✓ · `brand-promo` ✓ · `Brand_Promo` ✗).
 
 - **Still images →** Ken Burns (animated zoom + pan with `interpolate` on `useCurrentFrame()`).
 - **Footage →** `<Video src={staticFile("assets/clip.webm")} objectFit="cover" />`.

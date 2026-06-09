@@ -16,7 +16,9 @@ description: >
 
 You produce brand-aligned videos **from the user's project content**. Remotion is installed
 self-contained inside the user's project at `videos/` — no external engine required.
-All videos render to `videos/out/YYYY-MM-DD/topic.mp4` inside the project.
+Most videos render to `videos/out/YYYY-MM-DD/topic.mp4` inside the project.
+**Exception:** `editor-pro-max-ai-video` renders to a top-level `reels IA-<date>/` folder
+so AI-generated reels are instantly identifiable and separate from edited material.
 
 **This master skill does exactly two things, then hands off:**
 1. **Brand analysis** — load or create `videos/brand.json` (always first, no exception)
@@ -182,18 +184,24 @@ The master decides where to send the request. It does not edit.
 sub-skill via the Skill tool. **If ambiguous:** ask exactly ONE confirmation question,
 then route.
 
-| Request signal | Route to sub-skill | Flow |
+| Request signal | Route to sub-skill | Output |
 |---|---|---|
-| YouTube / youtu.be URL, "reel from this video", "extract shorts" | **`editor-pro-max-youtube-reel`** | download → segment → VP9 → karaoke → render |
-| "use my images/footage", project assets, testimonial, presentation | **`editor-pro-max-brand-video`** | scan assets → Ken Burns / footage → overlays → render |
-| "generate with AI", "make footage from scratch", Replicate | **`editor-pro-max-ai-video`** | brand prompt → Replicate → download → overlays → render |
+| YouTube / youtu.be URL, "reel from this video", "extract shorts" | **`editor-pro-max-youtube-reel`** | `videos/out/YYYY-MM-DD/` |
+| "use my images/footage", project assets, testimonial, presentation | **`editor-pro-max-brand-video`** | `videos/out/YYYY-MM-DD/` |
+| "generate with AI", "make footage from scratch", Replicate | **`editor-pro-max-ai-video`** | `reels IA-<date>/` (top-level) |
+
+**Tiebreaker — brand-video vs ai-video:**
+If the user describes a video without mentioning YouTube or AI/Replicate:
+- User has images or footage in the project → **`editor-pro-max-brand-video`**
+- Content doesn't exist yet in the project → **`editor-pro-max-ai-video`**
+- Not clear → ask exactly ONE question: *"¿Tienes imágenes o footage para este video, o quieres que lo genere con IA?"*
 
 **Handoff contract** — every sub-skill receives:
 - `videos/brand.json` already loaded (brand + `reel_style`)
 - The confirmed request: topic, platform/format, approximate duration
 
-The sub-skill runs its full flow and renders to `videos/out/YYYY-MM-DD/`. When it finishes,
-it reports back through the master's report format (Shared conventions).
+Each sub-skill runs its full flow and reports back through the master's report format
+(Shared conventions). `editor-pro-max-ai-video` reports its own path (`reels IA-<date>/`).
 
 > If a sub-skill is not yet installed, tell the user which one is missing and stop —
 > do not silently fall back to inline editing in the master.

@@ -30,26 +30,53 @@ npm run typecheck    # Verify TypeScript compiles cleanly
 
 ## Architecture
 
+### Skill system (master router + 3 sub-skills)
+
+This project operates in two contexts:
+
+- **Workshop instance** (Claude Code open in this folder): maintains the 4 `SKILL.md` source
+  files, rebuilds `.skill` packages. Reads this `CLAUDE.md`. To rebuild a package:
+  ```bash
+  TMP=$(mktemp -d) && mkdir -p "$TMP/<skill-name>"
+  cp <skill-name>/SKILL.md "$TMP/<skill-name>/"
+  (cd "$TMP" && zip -r - <skill-name>/) > <skill-name>.skill
+  rm -rf "$TMP"
+  ```
+- **User instances** (any project with the skill installed): receive the packaged `SKILL.md`
+  files only. They create `videos/brand.json`, run Remotion at `videos/`, and render output.
+
 ```
-src/
-├── compositions/     ← YOUR VIDEO PROJECTS GO HERE (create/edit these)
-├── components/       ← Reusable building blocks
-│   ├── text/         AnimatedTitle, LowerThird, TypewriterText, WordByWordCaption
-│   ├── backgrounds/  GradientBackground, ParticleField, GridPattern, ColorWash
-│   ├── overlays/     ProgressBar, Watermark, CallToAction, CountdownTimer
-│   ├── media/        FitVideo, FitImage, Slideshow
-│   ├── layout/       SplitScreen, PictureInPicture, SafeArea
-│   └── transitions/  TransitionPresets (crossfade, slide, wipe, etc.)
-├── templates/        ← Ready-made video templates
-│   ├── social/       TikTokVideo, InstagramReel, YouTubeShort
-│   ├── content/      Presentation, Testimonial
-│   └── promo/        Announcement, BeforeAfter
-├── presets/          ← Colors, dimensions, easings, fonts
-├── hooks/            ← useAnimation, useCaptions, useColorScheme
-├── schemas/          ← Zod schemas for all props
-├── utils/            ← Animation math helpers
-└── Root.tsx          ← REGISTER ALL COMPOSITIONS HERE
+editor-pro-max-Skill/              ← workshop root
+├── SKILL.md                       ← master router (brand analysis + routing only)
+├── editor-pro-max-youtube-reel/
+│   └── SKILL.md                   ← YouTube → vertical reel (VP9, JSON3 captions)
+├── editor-pro-max-brand-video/
+│   └── SKILL.md                   ← video from project assets (Ken Burns + footage)
+├── editor-pro-max-ai-video/
+│   └── SKILL.md                   ← hybrid: Replicate segments + stills + TransitionSeries
+├── *.skill                        ← built packages (gitignored, rebuilt from SKILL.md)
+└── .claude/skills/                ← symlinks for local skill discovery
 ```
+
+**User project layout** (created by the skill at runtime):
+```
+<user-project>/
+├── videos/
+│   ├── brand.json                 ← brand identity + reel_style (created once, reused forever)
+│   ├── node_modules/              ← Remotion engine (installed by Step 0)
+│   ├── compositions/              ← generated TSX compositions
+│   ├── public/assets/             ← source video, stills, audio
+│   └── out/YYYY-MM-DD/            ← rendered output (youtube-reel + brand-video)
+└── reels IA-<date>/               ← AI-generated reels (ai-video only, top-level)
+```
+
+**Routing:** master reads `brand.json` and delegates — never edits directly.
+**Engine rule:** Remotion composes and renders. ffmpeg only converts codecs (VP9/WebM) and
+concatenates chunks. Never use ffmpeg for text, captions, or visual effects.
+
+---
+
+### Component library (src/)
 
 ### How to create a new video
 

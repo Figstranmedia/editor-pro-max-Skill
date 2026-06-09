@@ -22,7 +22,11 @@ Invoked by the **`editor-pro-max`** master, which has already loaded `videos/bra
 confirmed the request (topic, format, duration). Shared conventions (safe zones, codec rule,
 chunk render, report format) live in the master — reference them.
 
-**Prerequisite:** `REPLICATE_API_TOKEN` in the environment (`.env.local`).
+**Prerequisite check:**
+```bash
+[ -n "$REPLICATE_API_TOKEN" ] && echo "Token OK" || echo "ERROR: REPLICATE_API_TOKEN not set — add to .env.local"
+ffmpeg -version > /dev/null 2>&1 && echo "ffmpeg OK" || echo "ERROR: ffmpeg not found — brew install ffmpeg"
+```
 
 **Engine rule (non-negotiable):** Remotion is the editor. ffmpeg is only a codec conversion
 utility — it converts Replicate's `.mp4` output to VP9/WebM so Chromium can read it, and

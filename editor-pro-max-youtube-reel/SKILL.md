@@ -146,6 +146,8 @@ cat videos/brand.json | jq '{colors: .brand.colors, reel: .reel_style}'
 ```json
 "reel_style": {
   "hook": false,
+  "subtitle_font": "Inter, sans-serif",
+  "subtitle_font_weight": 900,
   "subtitle_size_proportional": 0.038,
   "subtitle_color_active": "#FFEE00",
   "subtitle_color_inactive": "rgba(255,255,255,0.82)",
@@ -153,6 +155,10 @@ cat videos/brand.json | jq '{colors: .brand.colors, reel: .reel_style}'
   "progress_bar": false,
   "golden_line": true,
   "bottom_tag": true,
+  "watermark_text": "Brand Name",
+  "watermark_font": "Inter, sans-serif",
+  "watermark_color": "#ffffff",
+  "watermark_position_top_px": 340,
   "video_fit": "cover"
 }
 ```
